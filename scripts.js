@@ -43,14 +43,14 @@ document.addEventListener("DOMContentLoaded", function() {
                         document.getElementById("share-location").value = data.share_location;
                         document.getElementById("submit-button").textContent = "Simpan";
                     } 
-                    // else {
-                    //     document.getElementById("nama-pelapor").value = "";
-                    //     document.getElementById("no-hp-pelapor").value = "";
-                    //     document.getElementById("alamat-lengkap").value = "";
-                    //     document.getElementById("keluhan-gangguan").value = "";
-                    //     document.getElementById("share-location").value = "";
-                    //     document.getElementById("submit-button").textContent = "Simpan";
-                    // }
+                    else {
+                        document.getElementById("nama-pelapor").value = "";
+                        document.getElementById("no-hp-pelapor").value = "";
+                        document.getElementById("alamat-lengkap").value = "";
+                        document.getElementById("keluhan-gangguan").value = "";
+                        document.getElementById("share-location").value = "";
+                        document.getElementById("submit-button").textContent = "Simpan";
+                    }
                 });
         }
     });
@@ -123,8 +123,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function generateKdTiket() {
-        const randomNum = Math.floor(100000000 + Math.random() * 900000000);
-        document.getElementById("kd-tiket").value = `SMD-${randomNum}`;
+        const randomNum = Math.floor(1000000000 + Math.random() * 9000000000);
+        document.getElementById("kd-tiket").value = `IND${randomNum}`;
     }
 
     generateKdTiket();

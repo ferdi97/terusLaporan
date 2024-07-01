@@ -27,7 +27,7 @@
             <div class="dot blue"></div>
         </div>
         <div class="form-container">
-            <h1>ISI DATA ANDA</h1>
+            <h1>LAPORAN GANGGUAN</h1>
             <form id="data-form" action="koneksi.php" method="post">
                 <div class="form-group">
                     <input type="text" id="kd-tiket" name="kd_tiket" placeholder=" " readonly required>
@@ -59,7 +59,7 @@
                     </div>
                     <label for="share-location"></label>
                     <input type="text" id="share-location" name="share_location" placeholder=" " required>
-                    <button type="button" onclick="getCurrentLocation()">Get Current Location</button>
+                    <button type="button" onclick="getCurrentLocation()">Bagikan Lokasi</button>
                 </div>
                 <button type="submit" id="submit-button">Simpan</button>
             </form>

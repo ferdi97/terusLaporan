@@ -30,7 +30,7 @@ $sql = "INSERT INTO keluhan (nomor_internet, nama_pelapor, no_hp_pelapor, alamat
         kd_tiket = '$kd_tiket'";
 
 if ($conn->query($sql) === TRUE) {
-    echo "Data saved successfully!";
+    echo "Laporan anda telah tersimpan silahkan menunggu 1 x 24 jam terimakasih";
 } else {
     echo "Error saving data: " . $conn->error;
 }
