@@ -1,0 +1,283 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+/* html, body {
+    overflow: hidden;
+} */
+/* body * { */
+    /* -webkit-touch-callout: none; /* iOS Safari */
+    /* -webkit-user-select: none; /* Safari */
+    /* -khtml-user-select: none; /* Konqueror HTML */
+    /* -moz-user-select: none; /* Old versions of Firefox */
+    /* -ms-user-select: none; /* Internet Explorer/Edge */
+    /* user-select: none; Non-prefixed version, currently supported by Chrome, Edge, Opera, and Firefox
+/* } */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to bottom right, #610303, #4f0202);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 20px;
+}
+
+.container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    max-width: 900px;
+    width: 100%;
+    overflow: hidden;
+    padding: 20px;
+    transition: box-shadow 0.3s ease;
+    position: relative;
+    overflow-y: auto;
+    animation: flyInLeftSmooth 1s forwards cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.container:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.image-container {
+    position: relative;
+    flex: 1;
+    padding: 10px;
+    margin-right: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+}
+
+.image-container img {
+    position: absolute;
+    backface-visibility: hidden;
+    transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+.image-container img.image-1 {
+    transform: rotateY(0deg);
+}
+
+.image-container img.image-2 {
+    transform: rotateY(180deg);
+}
+
+.image-container:hover img.image-1 {
+    transform: rotateY(-180deg);
+}
+
+.image-container:hover img.image-2 {
+    transform: rotateY(0deg);
+}
+
+.separator {
+    width: 2px;
+    background-color: #ddd;
+    position: relative;
+    overflow: hidden;
+}
+
+.separator .dot {
+    position: absolute;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+}
+
+.separator .dot.red {
+    background-color: red;
+}
+
+.separator .dot.green {
+    background-color: green;
+}
+
+.separator .dot.blue {
+    background-color: blue;
+}
+
+.container:hover .separator .dot {
+    opacity: 1;
+    animation: rgbBorder 3s ease-in-out infinite alternate;
+}
+
+.separator .dot:nth-child(1) {
+    top: -10px;
+}
+
+.separator .dot:nth-child(2) {
+    top: 50%;
+}
+
+.separator .dot:nth-child(3) {
+    top: auto;
+    bottom: -10px;
+}
+
+.form-container {
+    flex: 2;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.2em; /* Mengurangi ukuran font h1 */
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 20px; /* Mengurangi margin antara grup input */
+}
+
+input[type="text"], input[type="tel"], textarea {
+    width: 100%;
+    margin-top: 15px;
+    padding: 8px; /* Mengurangi padding input dan textarea */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 0.9em; /* Mengurangi ukuran font input dan textarea */
+}
+
+input[type="text"]:hover, input[type="tel"]:hover, textarea:hover {
+    transform: translateY(0px);
+}
+
+input[type="text"]:focus, input[type="tel"]:focus, textarea:focus {
+    border-color: #df3b92;
+    outline: none;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+}
+
+textarea {
+    resize: none;
+}
+
+label {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    padding: 2px 5px;
+    color: #313131a8;
+    transition: all 0.3s ease;
+    transform: translateY(-30%);
+    font-size: 0.9em; /* Mengurangi ukuran font label */
+}
+
+input:focus + label,
+input:not(:placeholder-shown) + label,
+textarea:focus + label,
+textarea:not(:placeholder-shown) + label,
+input.active + label,
+textarea.active + label {
+    top: 0;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #6b0303;
+}
+
+button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 10px 15px; /* Menyesuaikan padding tombol */
+    background: linear-gradient(45deg, #510303, #53031e);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em; /* Mengurangi ukuran font tombol */
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background: linear-gradient(45deg, #3e0208, #390a85);
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+@keyframes rgbBorder {
+    0% {
+        top: -10px;
+    }
+    50% {
+        top: calc(100% - 10px);
+    }
+    100% {
+        top: -10px;
+    }
+}
+
+@keyframes flyInLeftSmooth {
+    0% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 900px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .image-container {
+        width: 100%;
+        padding: 0;
+        margin: 0 0 10px 0;
+    }
+
+    .separator {
+        display: none;
+    }
+
+    .form-container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.2em;
+    }
+
+    button {
+        font-size: 0.9em;
+    }
+
+    .image-container {
+        flex: none;
+        width: 100%;
+        max-height: 300px; /* Set a maximum height */
+        margin: 0 auto 20px; /* Center and add bottom margin */
+    }
+
+    .image-container img {
+        width: auto;
+        height: 100%;
+        max-height: 100%;
+        object-fit: cover; /* Cover the container */
+    }
+}
