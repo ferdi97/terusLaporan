@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <td data-label="KELUHAN">${item.keluhan}</td>
                             <td data-label="KOORDINAT"><a href="https://www.google.com/maps?q=${item.share_location}"
                                     target="_blank">https://www.google.com/maps?q=${item.share_location}</a></td>
-                            <td data-label="TANGGAL SUBMIT">${item.tanggal_submit}</td>
+                            <td data-label="TANGGAL SUBMIT">${item.tanggal_keluhan}</td>
                         </tr>
                     `;
                 });

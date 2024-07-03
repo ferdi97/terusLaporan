@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Input Data Gangguan</title>
+    <title>Lapor Gangguan</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="styles.css">
@@ -27,7 +27,7 @@
             <div class="dot blue"></div>
         </div>
         <div class="form-container">
-            <h1>LAPORAN GANGGUAN</h1>
+            <h1>LAPOR GANGGUAN</h1>
             <form id="data-form" action="koneksi.php" method="post">
                 <div class="form-group">
                     <input type="text" id="kd-tiket" name="kd_tiket" placeholder=" " readonly required>
