@@ -36,20 +36,20 @@ document.addEventListener("DOMContentLoaded", function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.found) {
-                        document.getElementById("nama-pelapor").value = data.nama_pelapor;
-                        document.getElementById("no-hp-pelapor").value = data.no_hp_pelapor;
-                        document.getElementById("alamat-lengkap").value = data.alamat_lengkap;
-                        document.getElementById("keluhan-gangguan").value = data.keluhan;
-                        document.getElementById("share-location").value = data.share_location;
-                        document.getElementById("submit-button").textContent = "Simpan";
+                        // document.getElementById("nama-pelapor").value = data.nama_pelapor;
+                        // document.getElementById("no-hp-pelapor").value = data.no_hp_pelapor;
+                        // document.getElementById("alamat-lengkap").value = data.alamat_lengkap;
+                        // document.getElementById("keluhan-gangguan").value = data.keluhan;
+                        // document.getElementById("share-location").value = data.share_location;
+                        // document.getElementById("submit-button").textContent = "Simpan";
                     } 
                     else {
-                        document.getElementById("nama-pelapor").value = "";
-                        document.getElementById("no-hp-pelapor").value = "";
-                        document.getElementById("alamat-lengkap").value = "";
-                        document.getElementById("keluhan-gangguan").value = "";
-                        document.getElementById("share-location").value = "";
-                        document.getElementById("submit-button").textContent = "Simpan";
+                        // document.getElementById("nama-pelapor").value = "";
+                        // document.getElementById("no-hp-pelapor").value = "";
+                        // document.getElementById("alamat-lengkap").value = "";
+                        // document.getElementById("keluhan-gangguan").value = "";
+                        // document.getElementById("share-location").value = "";
+                        // document.getElementById("submit-button").textContent = "Simpan";
                     }
                 });
         }
