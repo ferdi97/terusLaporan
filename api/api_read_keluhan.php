@@ -3,9 +3,9 @@ header('Content-Type: application/json');
 
 // Database connection parameters
 $servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "db_keluhan";
+$username = "u545755515_algoritma";
+$password = "Algoritma97";
+$dbname = "u545755515_db_keluhan";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -16,7 +16,7 @@ if ($conn->connect_error) {
 }
 
 // SQL query to fetch all data from the 'keluhan' table
-$sql = "SELECT id, nomor_internet, nama_pelapor, no_hp_pelapor, alamat_lengkap, keluhan, share_location, tanggal_submit FROM keluhan ORDER BY tanggal_submit DESC";
+$sql = "SELECT id, kd_tiket, nomor_internet, nama_pelapor, no_hp_pelapor, alamat_lengkap, keluhan, share_location, tanggal_keluhan FROM keluhan ORDER BY tanggal_keluhan DESC";
 $result = $conn->query($sql);
 
 $data = array();
