@@ -18,8 +18,8 @@
 <body>
     <div class="container">
         <div class="image-container">
-            <img src="img/12.png" alt="Placeholder Image" class="image-1">
-            <img src="img/23.png" alt="Placeholder Image" class="image-2">
+            <img src="img/indi.png" alt="Placeholder Image" class="image-1">
+            <img src="img/indi.png" alt="Placeholder Image" class="image-2">
         </div>
         <div class="separator">
             <div class="dot red"></div>
