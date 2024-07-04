@@ -1,13 +1,13 @@
 <?php
-// $servername = "localhost";
-// $username = "u545755515_algoritma";
-// $password = "Algoritma97";
-// $dbname = "u545755515_db_keluhan";
-
 $servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "db_keluhan";
+$username = "u545755515_algoritma";
+$password = "Algoritma97";
+$dbname = "u545755515_db_keluhan";
+
+// $servername = "localhost";
+// $username = "root";
+// $password = "";
+// $dbname = "db_keluhan";
 
 // Membuat koneksi
 $conn = new mysqli($servername, $username, $password, $dbname);
