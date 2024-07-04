@@ -28,7 +28,6 @@
                 <h3>Data Keluhan</h3>
                 <input type="text" id="search" placeholder="Search...">
                 <span class="search-icon"><i class="fas fa-search"></i></span>
-
             </header>
             <div class="table-container">
                 <table id="data-table">
@@ -43,6 +42,7 @@
                             <th>KELUHAN</th>
                             <th>KOORDINAT</th>
                             <th>TANGGAL SUBMIT</th>
+                            <th>AKSI</th>
                         </tr>
                     </thead>
                     <tbody id="table-body">

@@ -31,16 +31,50 @@ document.addEventListener('DOMContentLoaded', function () {
                             <td data-label="KOORDINAT"><a href="https://www.google.com/maps?q=${item.share_location}"
                                     target="_blank">https://www.google.com/maps?q=${item.share_location}</a></td>
                             <td data-label="TANGGAL SUBMIT">${item.tanggal_keluhan}</td>
+                            <td data-label="AKSI"><button class="delete-btn" data-id="${item.kd_tiket}">Delete</button></td>
                         </tr>
                     `;
                 });
                 tableBody.innerHTML = rows;
                 loader.style.display = 'none';
+
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const kdTiket = this.getAttribute('data-id');
+                        deleteRecord(kdTiket);
+                    });
+                });
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
                 loader.style.display = 'none'; // Hide loader on error
             });
+    }
+
+    // Function to delete a record
+    function deleteRecord(kdTiket) {
+        if (confirm('Are you sure you want to delete this record?')) {
+            fetch('data_fetch.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=delete&kd_tiket=${kdTiket}`,
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert('Record deleted successfully');
+                    fetchData();
+                } else {
+                    alert('Error deleting record');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting record:', error);
+            });
+        }
     }
 
     // Initial fetch data
@@ -70,12 +104,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // Event listener untuk navigasi link Data Keluhan
     dataKeluhanLink.addEventListener('click', () => {
         console.log('Data Keluhan link clicked');
-        // Tambahkan logika atau navigasi sesuai kebutuhan
+        // Tambahkan logika atau aksi yang diinginkan di sini
     });
 
     // Event listener untuk navigasi link Setting
     settingLink.addEventListener('click', () => {
         console.log('Setting link clicked');
-        // Tambahkan logika atau navigasi sesuai kebutuhan
+        // Tambahkan logika atau aksi yang diinginkan di sini
     });
 });
