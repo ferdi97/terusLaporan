@@ -1,13 +1,13 @@
 <?php
-$servername = "localhost";
-$username = "u545755515_algoritma";
-$password = "Algoritma97";
-$dbname = "u545755515_db_keluhan";
-
 // $servername = "localhost";
-// $username = "root";
-// $password = "";
-// $dbname = "db_keluhan";
+// $username = "u545755515_algoritma";
+// $password = "Algoritma97";
+// $dbname = "u545755515_db_keluhan";
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "db_keluhan";
 
 // Membuat koneksi
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -28,6 +28,25 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete' && isset($_POST['kd
     } else {
         echo json_encode(['status' => 'error']);
     }
+    $stmt->close();
+    $conn->close();
+    exit;
+}
+
+// Fungsi untuk mengambil data keluhan
+if (isset($_GET['action']) && $_GET['action'] === 'today') {
+    $today = date('Y-m-d');
+    $sql = "SELECT kd_tiket, nomor_internet, nama_pelapor, no_hp_pelapor, alamat_lengkap, keluhan, share_location, tanggal_keluhan FROM keluhan WHERE DATE(tanggal_keluhan) = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $today);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $data = array();
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
+    }
+    echo json_encode($data);
     $stmt->close();
     $conn->close();
     exit;

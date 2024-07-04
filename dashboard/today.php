@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Keluhan</title>
+    <title>Data Keluhan Hari Ini</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -18,15 +18,15 @@
             </div>
             <nav>
                 <ul>
-                    <li><a id="data-keluhan" href="index.php" class="active"><i class="fas fa-bug"></i> Data Keluhan</a></li>
-                    <li><a id="today-keluhan" href="today.php"><i class="fas fa-calendar-day"></i> Keluhan Hari Ini</a></li>
+                    <li><a id="data-keluhan" href="index.php"><i class="fas fa-bug"></i> Data Keluhan</a></li>
+                    <li><a id="today-keluhan" href="today.php" class="active"><i class="fas fa-calendar-day"></i> Keluhan Hari Ini</a></li>
                     <li><a id="setting" href="#"><i class="fas fa-cog"></i> Setting</a></li>
                 </ul>
             </nav>
         </div>
         <div class="content">
             <header>
-                <h3>Data Keluhan</h3>
+                <h3>Data Keluhan Hari Ini</h3>
                 <input type="text" id="search" placeholder="Search...">
                 <span class="search-icon"><i class="fas fa-search"></i></span>
             </header>
@@ -55,7 +55,7 @@
     </div>
     <div id="loader" class="loader"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" integrity="sha512-LjU08OqMwTKLa+4w6dD2yJX2L1q/3M/brIO9Tm4z8ktbQAM7hN5RPwrFroUKfZ7gGItBkdV8zF0w8N5edwYUgA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="scripts.js"></script>
+    <script src="scripts_today.js"></script>
 </body>
 
 </html>
