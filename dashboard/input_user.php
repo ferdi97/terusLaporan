@@ -27,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Eksekusi query
     if ($stmt->execute()) {
         $message = "Data berhasil disimpan!";
+        header('Location: login.php');
     } else {
         $message = "Error: " . $stmt->error;
     }
