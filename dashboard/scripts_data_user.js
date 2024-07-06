@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to delete a user
     confirmDelete.addEventListener('click', function () {
         if (deleteUserId) {
-            fetch('data_fetch.php', {
+            fetch('proses_edit.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
