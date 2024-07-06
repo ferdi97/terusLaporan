@@ -5,18 +5,7 @@ session_start();
 // Cek apakah form login sudah di-submit
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Simpan koneksi database dan informasi login di sini
-    $servername = "localhost";
-    $username_db = "root";
-    $password_db = "";
-    $dbname = "db_keluhan";
-
-    // Buat koneksi ke database
-    $conn = new mysqli($servername, $username_db, $password_db, $dbname);
-
-    // Memeriksa koneksi
-    if ($conn->connect_error) {
-        die("Koneksi gagal: " . $conn->connect_error);
-    }
+    include "../api/conec.php";
 
     // Ambil username dan password dari form
     $username = $_POST['username'];

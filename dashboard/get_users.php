@@ -2,16 +2,7 @@
 header('Content-Type: application/json');
 
 // Konfigurasi koneksi database
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "db_keluhan";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
-}
+include "../api/conec.php";
 
 $sql = "SELECT id, username, password, level_user FROM users";
 $result = $conn->query($sql);

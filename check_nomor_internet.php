@@ -1,14 +1,5 @@
 <?php
-$servername = "localhost";
-$username = "u545755515_algoritma";
-$password = "Algoritma97";
-$dbname = "u545755515_db_keluhan";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Koneksi ke database gagal: " . $conn->connect_error);
-}
+include "api/conec.php";
 
 $nomor_internet = $_GET['nomor_internet'];
 

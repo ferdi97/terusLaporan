@@ -1,21 +1,5 @@
 <?php
-// $servername = "localhost";
-// $username = "u545755515_algoritma";
-// $password = "Algoritma97";
-// $dbname = "u545755515_db_keluhan";
-
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "db_keluhan";
-
-// Membuat koneksi
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Memeriksa koneksi
-if ($conn->connect_error) {
-    die("Koneksi ke database gagal: " . $conn->connect_error);
-}
+include "api/conec.php";
 
 // Mendapatkan data dari request JSON
 $data = json_decode(file_get_contents("php://input"), true);

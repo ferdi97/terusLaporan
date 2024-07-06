@@ -8,17 +8,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 // Koneksi ke database
-$servername = "localhost";
-$username_db = "root"; // Ganti dengan username database Anda
-$password_db = ""; // Ganti dengan password database Anda
-$dbname = "db_keluhan"; // Ganti dengan nama database Anda
-
-$conn = new mysqli($servername, $username_db, $password_db, $dbname);
-
-// Memeriksa koneksi
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
-}
+include "../api/conec.php";
 
 // Periksa apakah form sudah dikirim
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

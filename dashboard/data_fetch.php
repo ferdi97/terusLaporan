@@ -1,16 +1,5 @@
 <?php
-$servername = "localhost";
-$username_db = "root";
-$password_db = "";
-$dbname = "db_keluhan";
-
-// Membuat koneksi
-$conn = new mysqli($servername, $username_db, $password_db, $dbname);
-
-// Memeriksa koneksi
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
-}
+include "../api/conec.php";
 
 // Mengatur zona waktu ke WITA
 date_default_timezone_set('Asia/Makassar');
