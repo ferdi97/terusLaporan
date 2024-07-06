@@ -82,13 +82,13 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
                     <div class="custom-select-wrapper">
                         <select id="editLevelUser" class="custom-select" required>
                             <option value="">Select Level</option>
-                            <option value="Admin">admin</option>
-                            <option value="User">user</option>
+                            <option value="admin">admin</option>
+                            <option value="user">user</option>
                         </select>
                         <div class="custom-select-trigger">Select Level</div>
                         <div class="custom-options">
-                            <span class="custom-option" data-value="Admin">Admin</span>
-                            <span class="custom-option" data-value="User">User</span>
+                            <span class="custom-option" data-value="admin">admin</span>
+                            <span class="custom-option" data-value="user">user</span>
                         </div>
                     </div>
                 </div>
