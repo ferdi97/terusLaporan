@@ -6,13 +6,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const dataKeluhanLink = document.getElementById('data-keluhan');
     const todayKeluhanLink = document.getElementById('today-keluhan');
     const settingLink = document.getElementById('setting');
+    const searchInput = document.getElementById('search');
     const content = document.querySelector('.content');
 
     loader.style.display = 'block';
 
     // Function to fetch data from server
-    function fetchData() {
-        fetch('data_fetch.php?action=today')
+    function fetchData(searchTerm = '') {
+        fetch(`data_fetch.php?action=today&search=${searchTerm}`)
             .then(response => response.json())
             .then(data => {
                 let rows = '';
@@ -94,5 +95,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     settingLink.addEventListener('click', () => {
         console.log('Setting link clicked');
+    });
+
+    // Event listener for search input
+    searchInput.addEventListener('input', () => {
+        fetchData(searchInput.value);
     });
 });

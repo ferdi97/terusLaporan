@@ -1,21 +1,19 @@
 <?php
 $servername = "localhost";
-$username = "u545755515_algoritma";
-$password = "Algoritma97";
-$dbname = "u545755515_db_keluhan";
-
-$servername = "localhost";
-$username = "root";
-$password = "";
+$username_db = "root";
+$password_db = "";
 $dbname = "db_keluhan";
 
 // Membuat koneksi
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username_db, $password_db, $dbname);
 
 // Memeriksa koneksi
 if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);
 }
+
+// Mengatur zona waktu ke WITA
+date_default_timezone_set('Asia/Makassar');
 
 // Fungsi untuk menghapus record
 if (isset($_POST['action']) && $_POST['action'] === 'delete' && isset($_POST['kd_tiket'])) {
@@ -33,12 +31,16 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete' && isset($_POST['kd
     exit;
 }
 
-// Fungsi untuk mengambil data keluhan
+// Fungsi untuk mengambil data keluhan hari ini berdasarkan waktu lokal
 if (isset($_GET['action']) && $_GET['action'] === 'today') {
     $today = date('Y-m-d');
-    $sql = "SELECT kd_tiket, nomor_internet, nama_pelapor, no_hp_pelapor, alamat_lengkap, keluhan, share_location, tanggal_keluhan FROM keluhan WHERE DATE(tanggal_keluhan) = ?";
+    $search = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : '%';
+    $sql = "SELECT kd_tiket, nomor_internet, nama_pelapor, no_hp_pelapor, alamat_lengkap, keluhan, share_location, tanggal_keluhan 
+            FROM keluhan 
+            WHERE DATE(tanggal_keluhan) = ? 
+            AND (kd_tiket LIKE ? OR nomor_internet LIKE ? OR nama_pelapor LIKE ? OR keluhan LIKE ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $today);
+    $stmt->bind_param("sssss", $today, $search, $search, $search, $search);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -52,6 +54,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'today') {
     exit;
 }
 
+// Query untuk mengambil semua data keluhan
 $sql = "SELECT kd_tiket, nomor_internet, nama_pelapor, no_hp_pelapor, alamat_lengkap, keluhan, share_location, tanggal_keluhan FROM keluhan";
 $result = $conn->query($sql);
 

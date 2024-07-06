@@ -20,7 +20,9 @@
                 <ul>
                     <li><a id="data-keluhan" href="index.php"><i class="fas fa-bug"></i> Data Keluhan</a></li>
                     <li><a id="today-keluhan" href="today.php" class="active"><i class="fas fa-calendar-day"></i> Keluhan Hari Ini</a></li>
+                    <li><a id="data-user" href="data_user.php"><i class="fas fa-user"></i> Data User</a></li>
                     <li><a id="setting" href="#"><i class="fas fa-cog"></i> Setting</a></li>
+                    <li><a id="logout" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
             </nav>
         </div>
