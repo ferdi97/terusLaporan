@@ -24,7 +24,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         <div id="sidebar" class="sidebar">
             <div class="sidebar-header">
                 <h2>Menu</h2>
-                <button id="toggle-btn"><i class="fas fa-bars"></i></button>
+                <!-- <button id="toggle-btn"><i class="fas fa-bars"></i></button> -->
             </div>
             <nav>
                 <ul>
