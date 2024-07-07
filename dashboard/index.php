@@ -33,9 +33,9 @@ $level_user = $_SESSION['level_user'];
             <nav>
                 <ul>
                     <li><a href="today.php"><i class="fas fa-calendar-day"></i> Keluhan Hari Ini</a></li>
-                    <?php if ($level_user == 'admin'): ?>
-                    <li><a href="index.php" class="active"><i class="fas fa-bug"></i> Data Keluhan</a></li>
-                    <li><a href="data_user.php" ><i class="fas fa-user"></i> Data User</a></li>
+                    <?php if ($level_user == 'admin') : ?>
+                        <li><a href="index.php" class="active"><i class="fas fa-bug"></i> Data Keluhan</a></li>
+                        <li><a href="data_user.php"><i class="fas fa-user"></i> Data User</a></li>
                     <?php endif; ?>
                     <!-- <li><a id="setting" href="#"><i class="fas fa-cog"></i> Setting</a></li> -->
                     <li><a id="logout" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -47,6 +47,7 @@ $level_user = $_SESSION['level_user'];
                 <h3>Data Keluhan</h3>
                 <input type="text" id="search" placeholder="Search...">
                 <span class="search-icon"><i class="fas fa-search"></i></span>
+
             </header>
             <div class="table-container">
                 <table id="data-table">
@@ -68,6 +69,11 @@ $level_user = $_SESSION['level_user'];
                         <!-- Rows will be inserted here by JavaScript -->
                     </tbody>
                 </table>
+                <div class="download-container">
+                    <a href="download_xlsx.php">
+                        <button id="download-xlsx" class="download-btn"><i class="fas fa-download"></i> Download XLSX</button>
+                    </a>
+                </div>
             </div>
         </div>
     </div>

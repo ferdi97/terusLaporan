@@ -112,4 +112,9 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Setting link clicked');
         // Tambahkan logika atau aksi yang diinginkan di sini
     });
+
+     // Event listener untuk tombol download
+    document.getElementById('download-xlsx').addEventListener('click', function () {
+        window.location.href = 'download_xlsx.php';
+    });
 });

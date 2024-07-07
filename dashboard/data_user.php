@@ -6,6 +6,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header('Location: login.php');
     exit;
 }
+if ($_SESSION['level_user'] !== 'admin') {
+    header('Location: unauthorized.php'); // ganti dengan halaman yang sesuai
+    exit;
+}
 $level_user = $_SESSION['level_user'];
 ?>
 <!DOCTYPE html>
@@ -29,9 +33,9 @@ $level_user = $_SESSION['level_user'];
             <nav>
                 <ul>
                     <li><a href="today.php"><i class="fas fa-calendar-day"></i> Keluhan Hari Ini</a></li>
-                    <?php if ($level_user == 'admin'): ?>
-                    <li><a href="index.php"><i class="fas fa-bug"></i> Data Keluhan</a></li>
-                    <li><a href="data_user.php" class="active"><i class="fas fa-user"></i> Data User</a></li>
+                    <?php if ($level_user == 'admin') : ?>
+                        <li><a href="index.php"><i class="fas fa-bug"></i> Data Keluhan</a></li>
+                        <li><a href="data_user.php" class="active"><i class="fas fa-user"></i> Data User</a></li>
                     <?php endif; ?>
                     <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
