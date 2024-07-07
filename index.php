@@ -4,108 +4,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Under Maintenance</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .container {
-            text-align: center;
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 90%;
-            color: #333;
-        }
-
-        h1 {
-            color: #00796b;
-            font-size: 3em;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        p {
-            font-size: 1.2em;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .loader {
-            border: 6px solid rgba(0, 121, 107, 0.2);
-            border-radius: 50%;
-            border-top: 6px solid #00796b;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .container {
-                padding: 30px;
-            }
-            h1 {
-                font-size: 2.5em;
-            }
-            p {
-                font-size: 1.1em;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            h1 {
-                font-size: 2em;
-            }
-            p {
-                font-size: 1em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 15px;
-            }
-            h1 {
-                font-size: 1.8em;
-            }
-            p {
-                font-size: 0.9em;
-            }
-        }
-    </style>
+    <title>Lapor Gangguan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <!-- <script>
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+    </script> -->
 </head>
 
 <body>
     <div class="container">
-        <img src="img/23bf6c175985a931c3c2d893f21f3313.gif" alt="Under Maintenance" style="max-width: 50%; height: auto;">
-        <h1>Oopss!!!</h1>
-        <p>Kami mohon maaf atas ketidaknyamanan ini. Halaman yang Anda cari sedang dalam proses perbaikan agar bisa memberikan pengalaman yang lebih baik.</p>
-        <p>Silakan coba lagi nanti.</p>
+        <div class="image-container">
+            <img src="img/indi.png" alt="Placeholder Image" class="image-1">
+            <img src="img/indi.png" alt="Placeholder Image" class="image-2">
+        </div>
+        <div class="separator">
+            <div class="dot red"></div>
+            <div class="dot green"></div>
+            <div class="dot blue"></div>
+        </div>
+        <div class="form-container">
+            <h1>LAPOR GANGGUAN</h1>
+            <form id="data-form" action="koneksi.php" method="post">
+                <div class="form-group">
+                    <input type="text" id="kd-tiket" name="kd_tiket" placeholder=" " readonly required>
+                    <label for="kd-tiket">KD TIKET</label>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="nomor-internet" name="nomor_internet" placeholder=" " required>
+                    <label for="nomor-internet">Nomor Internet</label>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="nama-pelapor" name="nama_pelapor" placeholder=" " required>
+                    <label for="nama-pelapor">Nama Pelapor</label>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="no-hp-pelapor" name="no_hp_pelapor" placeholder=" " required>
+                    <label for="no-hp-pelapor">No HP Pelapor</label>
+                </div>
+                <div class="form-group">
+                    <textarea id="alamat-lengkap" rows="3" name="alamat_lengkap" placeholder=" " required></textarea>
+                    <label for="alamat-lengkap">Alamat Lengkap</label>
+                </div>
+                <div class="form-group">
+                    <textarea id="keluhan-gangguan" rows="3" name="keluhan" placeholder=" " required></textarea>
+                    <label for="keluhan-gangguan">Keluhan Gangguan</label>
+                </div>
+                <div class="form-group">
+                    <div class="map-container">
+                        <div id="map" style="height: 300px;"></div>
+                    </div>
+                    <label for="share-location"></label>
+                    <input type="text" id="share-location" name="share_location" placeholder=" " required>
+                    <button type="button" onclick="getCurrentLocation()">Bagikan Lokasi</button>
+                </div>
+                <button type="submit" id="submit-button">Simpan</button>
+            </form>
+        </div>
     </div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="scripts.js"></script>
 </body>
 
 </html>
