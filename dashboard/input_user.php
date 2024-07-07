@@ -1,11 +1,11 @@
 <?php
-// session_start();
+session_start();
 
-// // Cek apakah pengguna sudah login
-// if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-//     header('Location: login.php');
-//     exit;
-// }
+// Cek apakah pengguna sudah login
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header('Location: login.php');
+    exit;
+}
 
 // Koneksi ke database
 include "../api/conec.php";
