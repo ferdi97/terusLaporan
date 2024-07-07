@@ -37,8 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['user_id'] = $id;
             $_SESSION['level_user'] = $level_user;
 
-            // Redirect ke halaman index.php atau halaman lain setelah login berhasil
-            header('Location: index.php');
+            // Redirect berdasarkan level user
+            if ($level_user === 'admin') {
+                header('Location: index.php');
+            } else {
+                header('Location: today.php');
+            }
             exit;
         } else {
             // Password tidak cocok
