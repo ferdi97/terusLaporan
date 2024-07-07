@@ -6,7 +6,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header('Location: login.php');
     exit;
 }
-
+$level_user = $_SESSION['level_user'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,9 +28,11 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
             </div>
             <nav>
                 <ul>
-                    <li><a id="data-keluhan" href="index.php" class="active"><i class="fas fa-bug"></i> Data Keluhan</a></li>
-                    <li><a id="today-keluhan" href="today.php"><i class="fas fa-calendar-day"></i> Keluhan Hari Ini</a></li>
-                    <li><a id="data-user" href="data_user.php"><i class="fas fa-user"></i> Data User</a></li>
+                    <li><a href="today.php"><i class="fas fa-calendar-day"></i> Keluhan Hari Ini</a></li>
+                    <?php if ($level_user == 'admin'): ?>
+                    <li><a href="index.php" class="active"><i class="fas fa-bug"></i> Data Keluhan</a></li>
+                    <li><a href="data_user.php" ><i class="fas fa-user"></i> Data User</a></li>
+                    <?php endif; ?>
                     <!-- <li><a id="setting" href="#"><i class="fas fa-cog"></i> Setting</a></li> -->
                     <li><a id="logout" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>

@@ -3,9 +3,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const tableBody = document.getElementById('table-body');
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('toggle-btn');
-    const dataKeluhanLink = document.getElementById('data-keluhan');
-    const todayKeluhanLink = document.getElementById('today-keluhan');
-    const settingLink = document.getElementById('setting');
     const searchInput = document.getElementById('search');
     const content = document.querySelector('.content');
 
@@ -13,9 +10,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to fetch data from server
     function fetchData(searchTerm = '') {
-        fetch(`data_fetch.php?action=today&search=${searchTerm}`)
+        fetch(`data_fetch.php?action=today&search=${encodeURIComponent(searchTerm)}`)
             .then(response => response.json())
             .then(data => {
+                // Reverse the data array to display the newest data first
+                data.reverse();
+
                 let rows = '';
                 data.forEach((item, index) => {
                     rows += `
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(result => {
                 if (result.status === 'success') {
                     alert('Record deleted successfully');
-                    fetchData();
+                    fetchData(searchInput.value); // Refetch data with current search term
                 } else {
                     alert('Error deleting record');
                 }
@@ -76,29 +76,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Initial data fetch
+    // Initial fetch data
     fetchData();
 
-    // Event listener for sidebar toggle button
+    // Refresh data every 5 seconds
+    setInterval(fetchData, 5000);
+
+    // Search functionality
+    searchInput.addEventListener('input', function () {
+        fetchData(this.value.toLowerCase());
+    });
+
     toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('active');
-    });
-
-    // Event listener for sidebar links
-    dataKeluhanLink.addEventListener('click', () => {
-        console.log('Data Keluhan link clicked');
-    });
-
-    todayKeluhanLink.addEventListener('click', () => {
-        console.log('Keluhan Hari Ini link clicked');
-    });
-
-    settingLink.addEventListener('click', () => {
-        console.log('Setting link clicked');
-    });
-
-    // Event listener for search input
-    searchInput.addEventListener('input', () => {
-        fetchData(searchInput.value);
+        sidebar.classList.toggle('collapsed');
+        content.classList.toggle('header-collapsed');
     });
 });

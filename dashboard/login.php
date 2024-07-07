@@ -15,14 +15,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $conn->real_escape_string($username);
 
     // Buat query untuk memeriksa kecocokan username dan password
-    $sql = "SELECT id, username, password FROM users WHERE username = ?";
+    $sql = "SELECT id, username, password, level_user FROM users WHERE username = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
 
     // Bind result variables
-    $stmt->bind_result($id, $db_username, $db_password);
+    $stmt->bind_result($id, $db_username, $db_password, $level_user);
 
     // Check jika username ditemukan
     if ($stmt->num_rows > 0) {
@@ -35,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['loggedin'] = true;
             $_SESSION['username'] = $username;
             $_SESSION['user_id'] = $id;
+            $_SESSION['level_user'] = $level_user;
 
             // Redirect ke halaman index.php atau halaman lain setelah login berhasil
             header('Location: index.php');

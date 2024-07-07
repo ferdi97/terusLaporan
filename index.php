@@ -6,12 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page Under Maintenance</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" integrity="sha384-oqdWg7N0a6Zd5O8jwJ7P+1Qv5QNS1u+Z9+8ObCB/5pvPjTUByEme2n6fh0+9uoI0" crossorigin="anonymous"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            /* Menggunakan font Poppins */
             background-color: #f0f0f0;
             display: flex;
             justify-content: center;
@@ -38,12 +36,6 @@
             font-weight: bold;
         }
 
-        h2 {
-            color: #004d40;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-        }
-
         p {
             font-size: 1.2em;
             line-height: 1.6;
@@ -64,9 +56,20 @@
             0% {
                 transform: rotate(0deg);
             }
-
             100% {
                 transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                padding: 30px;
+            }
+            h1 {
+                font-size: 2.5em;
+            }
+            p {
+                font-size: 1.1em;
             }
         }
 
@@ -74,29 +77,33 @@
             .container {
                 padding: 20px;
             }
-
             h1 {
-                font-size: 2.5em;
+                font-size: 2em;
             }
-
-            h2 {
-                font-size: 1.5em;
-            }
-
             p {
                 font-size: 1em;
             }
         }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            p {
+                font-size: 0.9em;
+            }
+        }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div class="container">
-        <img src="img/indi.png" alt="Under Maintenance" style="max-width: 20%; height: auto;">
+        <img src="img/23bf6c175985a931c3c2d893f21f3313.gif" alt="Under Maintenance" style="max-width: 50%; height: auto;">
         <h1>Oopss!!!</h1>
         <p>Kami mohon maaf atas ketidaknyamanan ini. Halaman yang Anda cari sedang dalam proses perbaikan agar bisa memberikan pengalaman yang lebih baik.</p>
-        <div class="loader"></div>
         <p>Silakan coba lagi nanti.</p>
     </div>
 </body>

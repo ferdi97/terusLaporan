@@ -24,24 +24,30 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete' && isset($_POST['kd
 if (isset($_GET['action']) && $_GET['action'] === 'today') {
     $today = date('Y-m-d');
     $search = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : '%';
+    // Query untuk pencarian data dengan parameter $search
     $sql = "SELECT kd_tiket, nomor_internet, nama_pelapor, no_hp_pelapor, alamat_lengkap, keluhan, share_location, tanggal_keluhan 
             FROM keluhan 
             WHERE DATE(tanggal_keluhan) = ? 
             AND (kd_tiket LIKE ? OR nomor_internet LIKE ? OR nama_pelapor LIKE ? OR keluhan LIKE ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssss", $today, $search, $search, $search, $search);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    if ($stmt) {
+        $stmt->bind_param("sssss", $today, $search, $search, $search, $search);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    $data = array();
-    while ($row = $result->fetch_assoc()) {
-        $data[] = $row;
+        $data = array();
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+        $stmt->close();
+    } else {
+        echo json_encode(['error' => 'Query preparation error']);
     }
-    echo json_encode($data);
-    $stmt->close();
     $conn->close();
     exit;
 }
+
 
 // Query untuk mengambil semua data keluhan
 $sql = "SELECT kd_tiket, nomor_internet, nama_pelapor, no_hp_pelapor, alamat_lengkap, keluhan, share_location, tanggal_keluhan FROM keluhan";
@@ -58,3 +64,4 @@ if ($result->num_rows > 0) {
 echo json_encode($data);
 
 $conn->close();
+?>

@@ -6,7 +6,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header('Location: login.php');
     exit;
 }
-
+$level_user = $_SESSION['level_user'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,9 +28,11 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
             </div>
             <nav>
                 <ul>
-                    <li><a id="data-keluhan" href="index.php"><i class="fas fa-bug"></i> Data Keluhan</a></li>
-                    <li><a id="today-keluhan" href="today.php" class="active"><i class="fas fa-calendar-day"></i> Keluhan Hari Ini</a></li>
-                    <li><a id="data-user" href="data_user.php"><i class="fas fa-user"></i> Data User</a></li>
+                    <li><a href="today.php" class="active"><i class="fas fa-calendar-day"></i> Keluhan Hari Ini</a></li>
+                    <?php if ($level_user == 'admin'): ?>
+                    <li><a href="index.php"><i class="fas fa-bug"></i> Data Keluhan</a></li>
+                    <li><a href="data_user.php" ><i class="fas fa-user"></i> Data User</a></li>
+                    <?php endif; ?>
                     <!-- <li><a id="setting" href="#"><i class="fas fa-cog"></i> Setting</a></li> -->
                     <li><a id="logout" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
@@ -55,7 +57,9 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
                             <th>KELUHAN</th>
                             <th>KOORDINAT</th>
                             <th>TANGGAL SUBMIT</th>
+                            <?php if ($level_user == 'admin'): ?>
                             <th>AKSI</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody id="table-body">
@@ -66,6 +70,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         </div>
     </div>
     <div id="loader" class="loader"></div>
+    <script>const level_user = '<?php echo $level_user; ?>';</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" integrity="sha512-LjU08OqMwTKLa+4w6dD2yJX2L1q/3M/brIO9Tm4z8ktbQAM7hN5RPwrFroUKfZ7gGItBkdV8zF0w8N5edwYUgA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="scripts_today.js"></script>
 </body>
