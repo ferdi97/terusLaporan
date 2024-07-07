@@ -6,6 +6,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header('Location: login.php');
     exit;
 }
+if ($_SESSION['level_user'] !== 'admin') {
+    header('Location: unauthorized.php'); // ganti dengan halaman yang sesuai
+    exit;
+}
 $level_user = $_SESSION['level_user'];
 ?>
 <!DOCTYPE html>
