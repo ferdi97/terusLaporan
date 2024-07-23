@@ -31,7 +31,11 @@ $sql = "INSERT INTO keluhan (nomor_internet, nama_pelapor, no_hp_pelapor, alamat
 
 // Menjalankan query
 if ($conn->query($sql) === TRUE) {
-    echo "Laporan anda telah tersimpan silahkan menunggu 1 x 24 jam terimakasih";
+    echo "Terima kasih atas laporan yang Anda kirimkan. Kami ingin memberitahukan bahwa laporan Anda telah berhasil tersimpan dalam sistem kami. Tim kami akan segera memulai proses verifikasi dan analisis terhadap laporan tersebut.
+
+Proses ini biasanya memerlukan waktu hingga 24 jam untuk memastikan bahwa semua detail yang Anda berikan ditinjau secara menyeluruh dan akurat. Kami sangat menghargai kesabaran dan pengertian Anda selama periode ini.
+
+Apabila ada informasi tambahan yang diperlukan, kami akan segera menghubungi Anda. Jika tidak ada kendala, Anda dapat mengharapkan pembaruan atau penyelesaian dalam waktu 24 jam. Terima kasih atas kerjasama dan kepercayaan Anda.";
 } else {
     echo "Error saving data: " . $conn->error;
 }

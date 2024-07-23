@@ -28,7 +28,7 @@
         </div>
         <div class="form-container">
             <h1>LAPOR GANGGUAN</h1>
-            <form id="data-form" action="koneksi.php" method="post">
+            <form id="data-form" action="" method="post">
                 <div class="form-group">
                     <input type="text" id="kd-tiket" name="kd_tiket" placeholder=" " readonly required>
                     <label for="kd-tiket">KD TIKET</label>
@@ -58,7 +58,7 @@
                         <div id="map" style="height: 300px;"></div>
                     </div>
                     <label for="share-location"></label>
-                    <input type="text" id="share-location" name="share_location" placeholder=" " required>
+                    <input type="text" id="share-location" name="share_location" placeholder=" " readonly required>
                     <button type="button" onclick="getCurrentLocation()">Bagikan Lokasi</button>
                 </div>
                 <button type="submit" id="submit-button">Simpan</button>
