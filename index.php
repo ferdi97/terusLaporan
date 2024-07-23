@@ -8,11 +8,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="styles.css">
-    <!-- <script>
+    <script>
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
         });
-    </script> -->
+
+        document.addEventListener('keydown', function(e) {
+            // Menonaktifkan F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+            }
+            // Menonaktifkan Ctrl+Shift+I (Inspect Element)
+            if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                e.preventDefault();
+            }
+            // Menonaktifkan Ctrl+Shift+J (Console)
+            if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+                e.preventDefault();
+            }
+            // Menonaktifkan Ctrl+U (View Source)
+            if (e.ctrlKey && e.key === 'U') {
+                e.preventDefault();
+            }
+        });
+    </script>
 </head>
 
 <body>
@@ -49,6 +68,7 @@
                     <textarea id="alamat-lengkap" rows="3" name="alamat_lengkap" placeholder=" " required></textarea>
                     <label for="alamat-lengkap">Alamat Lengkap</label>
                 </div>
+                
                 <div class="form-group">
                     <textarea id="keluhan-gangguan" rows="3" name="keluhan" placeholder=" " required></textarea>
                     <label for="keluhan-gangguan">Keluhan Gangguan</label>
@@ -59,7 +79,7 @@
                     </div>
                     <label for="share-location"></label>
                     <input type="text" id="share-location" name="share_location" placeholder=" " readonly required>
-                    <button type="button" onclick="getCurrentLocation()">Bagikan Lokasi</button>
+                    <button type="button" id="shareButton" onclick="getCurrentLocation()">Bagikan Lokasi</button>
                 </div>
                 <button type="submit" id="submit-button">Simpan</button>
             </form>

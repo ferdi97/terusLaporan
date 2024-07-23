@@ -56,29 +56,51 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     function validateForm() {
+        const nomorNotel = document.getElementById("no-hp-pelapor");
+        const nomorNotelValue = nomorNotel.value.trim();
         const nomorInternetInput = document.getElementById("nomor-internet");
         const nomorInternetValue = nomorInternetInput.value.trim();
+        const shareLoc = document.getElementById("share-location");
+        const shareLocValue = shareLoc.value.trim();
+        const shareButton = document.getElementById("shareButton");
+        
 
         const numberRegex = /^\d+$/;
 
+        if (shareLocValue === "") {
+            alert("Silakan klik untuk membagikan lokasi Anda");
+            shareLoc.focus();
+            return false;
+        }
+
+        if (!nomorNotelValue.match(numberRegex)) {
+            alert("Nomor Telpon harus berupa angka.");
+            nomorNotel.focus();
+            return false;
+        }
+
         if (!nomorInternetValue.match(numberRegex)) {
             alert("Nomor Internet harus berupa angka.");
+            nomorInternetInput.focus();
             return false;
         }
 
         if (!nomorInternetValue.startsWith("05") && !nomorInternetValue.startsWith("16")) {
             alert("Nomor Internet harus diawali dengan '05' atau '16'.");
+            nomorInternetInput.focus();
             return false;
         }
 
         if (nomorInternetValue.startsWith("16")) {
             if (nomorInternetValue.length < 12 || nomorInternetValue.length > 13) {
                 alert("Nomor Internet yang diawali dengan '16' harus memiliki panjang 12 atau 13 digit.");
+                nomorInternetInput.focus();
                 return false;
             }
         } else if (nomorInternetValue.startsWith("05")) {
             if (nomorInternetValue.length < 9 || nomorInternetValue.length > 10) {
                 alert("Nomor Internet yang diawali dengan '05' harus memiliki panjang minimal 9 digit dan tidak boleh lebih dari 10.");
+                nomorInternetInput.focus();
                 return false;
             }
         }
