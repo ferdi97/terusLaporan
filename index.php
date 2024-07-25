@@ -50,7 +50,7 @@
             <form id="data-form" action="" method="post">
                 <div class="form-group">
                     <input type="text" id="kd-tiket" name="kd_tiket" placeholder=" " readonly required>
-                    <label for="kd-tiket">KD TIKET</label>
+                    <label for="kd-tiket">ID TIKET</label>
                 </div>
                 <div class="form-group">
                     <input type="text" id="nomor-internet" name="nomor_internet" placeholder=" " required>
@@ -68,7 +68,7 @@
                     <textarea id="alamat-lengkap" rows="3" name="alamat_lengkap" placeholder=" " required></textarea>
                     <label for="alamat-lengkap">Alamat Lengkap</label>
                 </div>
-                
+
                 <div class="form-group">
                     <textarea id="keluhan-gangguan" rows="3" name="keluhan" placeholder=" " required></textarea>
                     <label for="keluhan-gangguan">Keluhan Gangguan</label>
