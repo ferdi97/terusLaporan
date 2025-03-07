@@ -84,7 +84,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>Form Tiket & Inet</h2>
+        <h2>FORM SCC INET</h2>
         <div class="input-group">
             <input type="text" id="noTiket" placeholder="No Tiket" required>
         </div>
