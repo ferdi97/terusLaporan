@@ -150,7 +150,7 @@
         </div>
         <div class="input-group">
             <i class="fas fa-lock"></i>
-            <input type="password" placeholder="Password">
+            <input type="text" placeholder="Password">
         </div>
         <div class="input-group">
             <i class="fas fa-lock"></i>
