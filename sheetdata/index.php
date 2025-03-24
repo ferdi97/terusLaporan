@@ -35,53 +35,51 @@ foreach ($headers as $index => $header) {
     <title>Data Google Sheets</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
         body {
             background-color: #f8f9fa;
             font-family: 'Poppins', sans-serif;
+            font-size: xx-small;
         }
         .container {
             margin-top: 20px;
+            max-width: 100%;
         }
         .table-container {
             background: #fff;
             padding: 15px;
+            font-size: xx-small;
             border-radius: 8px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .filter-select, .search-box {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        .table tbody tr {
-            transition: background-color 0.2s;
-        }
-        .table tbody tr:hover {
-            background-color: rgba(0, 123, 255, 0.1);
-        }
-        .scroll-container {
             overflow-x: auto;
-            white-space: nowrap;
-            margin-bottom: 10px;
+        }
+        .filter-select {
+            font-size: xx-small;
+            width: 100%;
+        }
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background: #343a40;
+            color: white;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="table-container">
-            <h4 class="text-center">ENTRY DATA</h4>
-            <input type="text" id="searchInput" class="search-box" placeholder="Cari data..." onkeyup="searchTable()">
-            <div class="scroll-container">
+            <h2 class="text-center">Data dari Google Sheets</h2>
+            <div class="table-responsive">
                 <table class="table table-striped table-bordered" id="dataTable">
                     <thead class="table-dark">
                         <tr>
                             <?php 
                             foreach ($headers as $index => $header) {
-                                echo "<th>" . htmlspecialchars($header) . "<br><select class='filter-select' data-index='$index' onchange='filterTable()'>";
-                                echo "<option value=''>Semua</option>";
+                                echo "<th>" . htmlspecialchars($header) . "<br><select class='filter-select' data-index='$index'><option value=''>Semua</option>";
                                 foreach ($filterOptions[$index] as $option) {
                                     echo "<option value='" . htmlspecialchars($option) . "'>" . htmlspecialchars($option) . "</option>";
                                 }
@@ -105,24 +103,34 @@ foreach ($headers as $index => $header) {
             </div>
         </div>
     </div>
+
     <script>
-        function filterTable() {
-            let selects = document.querySelectorAll(".filter-select");
-            let rows = document.querySelectorAll("#dataTable tbody tr");
-            let filters = Array.from(selects).map(select => select.value.toLowerCase());
-            rows.forEach(row => {
-                let rowData = JSON.parse(row.getAttribute("data-row"));
-                let showRow = filters.every((filter, index) => !filter || (rowData[index] && rowData[index].toLowerCase() === filter));
-                row.style.display = showRow ? "" : "none";
+        $(document).ready(function() {
+            $('.filter-select').select2({
+                width: '100%',
+                allowClear: true,
+                placeholder: "Pilih atau ketik"
             });
-        }
-        function searchTable() {
-            let input = document.getElementById("searchInput").value.toLowerCase();
-            let rows = document.querySelectorAll("#dataTable tbody tr");
-            rows.forEach(row => {
-                let rowData = JSON.parse(row.getAttribute("data-row"));
-                let showRow = rowData.some(cell => cell.toLowerCase().includes(input));
-                row.style.display = showRow ? "" : "none";
+
+            let debounceTimer;
+            $('.filter-select').on('change', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(filterTable, 200);
+            });
+        });
+
+        function filterTable() {
+            let filters = {};
+            $('.filter-select').each(function() {
+                let index = $(this).data('index');
+                let value = $(this).val()?.toLowerCase() || "";
+                if (value) filters[index] = value;
+            });
+
+            $('#dataTable tbody tr').each(function() {
+                let rowData = JSON.parse($(this).attr('data-row'));
+                let showRow = Object.keys(filters).every(index => rowData[index]?.toLowerCase().includes(filters[index]));
+                $(this).css("display", showRow ? "" : "none");
             });
         }
     </script>
