@@ -1,3 +1,58 @@
+<?php
+session_start();
+
+// Koneksi ke database
+$host = "localhost";
+$username = "root";
+$password = "";
+$database = "db_keluhan";
+
+$conn = new mysqli($host, $username, $password, $database);
+
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
+}
+
+// Proses login
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = htmlspecialchars($_POST['username']);
+    $password = $_POST['password'];
+
+    // Query untuk cek user
+    $sql = "SELECT * FROM csr_users WHERE username = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows == 1) {
+        $user = $result->fetch_assoc();
+        
+        // Verifikasi password
+        if (password_verify($password, $user['password'])) {
+            // Simpan data user di session
+            $_SESSION['user'] = [
+                'id' => $user['id'],
+                'nama_csr' => $user['nama_csr'],
+                'username' => $user['username'],
+                'lokasi_grapari' => $user['lokasi_grapari']
+            ];
+            
+            // Redirect ke halaman input keluhan
+            header("Location: input_keluhan.php");
+            exit();
+        } else {
+            $error = "Password salah!";
+        }
+    } else {
+        $error = "Username tidak ditemukan!";
+    }
+    
+    $stmt->close();
+}
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -161,15 +216,22 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             font-weight: bold;
             letter-spacing: 1px;
+            width: 100%;
         }
         .login-btn:hover {
             background: linear-gradient(45deg, #ff6a88, #ff9a8b);
             transform: translateY(-3px) scale(1.05);
         }
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+            display: <?php echo isset($error) ? 'block' : 'none'; ?>;
+        }
     </style>
 </head>
 <body>
-     <div class="loading-screen" id="loading-screen">
+    <div class="loading-screen" id="loading-screen">
         <div class="cube">
             <div class="front"></div>
             <div class="back"></div>
@@ -179,29 +241,61 @@
             <div class="bottom"></div>
         </div>
     </div>
+    
     <div class="login-container" id="login-container">
-        <h2>Login</h2>
-        <div class="input-group">
-            <i class="fas fa-user"></i>
-            <input type="text" placeholder="Username">
-        </div>
-        <div class="input-group">
-            <i class="fas fa-lock"></i>
-            <input type="password" id="password" placeholder="Password">
-        </div>
-        <label class="show-password"><input type="checkbox" id="showPassword"> Show Password</label>
-        <button class="login-btn">Login</button>
+        <h2>Login CSR</h2>
+        
+        <?php if (isset($error)): ?>
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i> <?php echo $error; ?>
+            </div>
+        <?php endif; ?>
+        
+        <form action="index.php" method="POST">
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" name="password" placeholder="Password" required>
+            </div>
+            
+            <label class="show-password">
+                <input type="checkbox" id="showPassword"> Show Password
+            </label>
+            
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
     </div>
+
     <script>
+        // Loading screen animation
         document.addEventListener("DOMContentLoaded", function () {
             setTimeout(() => {
                 document.getElementById("loading-screen").classList.add("hidden");
                 document.getElementById("login-container").style.display = "block";
             }, 1500);
         });
+
+        // Show/hide password
         document.getElementById("showPassword").addEventListener("change", function() {
-            let passwordField = document.getElementById("password");
+            const passwordField = document.getElementById("password");
             passwordField.type = this.checked ? "text" : "password";
+        });
+
+        // Form validation
+        document.querySelector("form").addEventListener("submit", function(e) {
+            const username = document.querySelector("input[name='username']").value;
+            const password = document.getElementById("password").value;
+            
+            if (!username || !password) {
+                e.preventDefault();
+                alert("Username dan password harus diisi!");
+            }
         });
     </script>
 </body>

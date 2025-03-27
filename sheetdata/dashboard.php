@@ -142,6 +142,30 @@
             padding: 1rem 0.5rem;
         }
 
+        .clickable-count {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .clickable-count:hover {
+            background-color: #f1f3ff;
+            font-weight: bold;
+        }
+
+        .modal-ticket-list {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .ticket-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+        }
+
+        .ticket-item:last-child {
+            border-bottom: none;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -230,10 +254,36 @@
         </div>
     </div>
 
+    <!-- Modal for showing ticket details -->
+    <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ticketModalLabel">Ticket Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <div><strong>Sektor:</strong> <span id="modalSector"></span></div>
+                        <div><strong>Status:</strong> <span id="modalStatus"></span></div>
+                        <div><strong>Tipe:</strong> <span id="modalType"></span></div>
+                    </div>
+                    <div class="modal-ticket-list" id="ticketList">
+                        <!-- Ticket items will be inserted here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <script>
     const API_KEY = "AIzaSyDFdaSruBmI5mqA48IdCDeJvlnUppiJ5jA";
     const SPREADSHEET_ID = "1cNEzrgnhuijPC-qCR8UKG-NzRFVcpUF9i3gOG3anoU4";
     const RANGE = "MASTER_DATA!A1:V";
+    let allTicketData = []; // Store all ticket data for filtering
 
     async function fetchData() {
         try {
@@ -255,7 +305,20 @@
         }
 
         const headers = rows[0];
-        const data = rows.slice(1);
+        allTicketData = rows.slice(1).map(row => {
+            return {
+                id: row[0],
+                title: row[1],
+                description: row[2],
+                createdDate: row[3],
+                priority: row[4],
+                type: row[6] || 'Unknown',
+                flag: row[8],
+                sector: row[9] || '',
+                status: row[16] || 'Unknown',
+                // Add other fields as needed
+            };
+        });
         
         const processedData = {
             sectors: {},
@@ -264,10 +327,8 @@
             detailed: {}
         };
 
-        data.forEach(row => {
-            const sector = row[9] || '';
-            const type = row[6] || 'Unknown';
-            const status = row[16] || 'Unknown';
+        allTicketData.forEach(ticket => {
+            const { sector, type, status } = ticket;
 
             // Skip empty sector data
             if (sector.trim() === '') {
@@ -478,12 +539,30 @@
                             .sort()
                             .forEach(type => {
                                 const count = typeData[type] || 0;
-                                row.innerHTML += `<td>${count}</td>`;
+                                if (count > 0) {
+                                    row.innerHTML += `<td class="clickable-count" 
+                                        data-sector="${sector}" 
+                                        data-status="${status}" 
+                                        data-type="${type}">${count}</td>`;
+                                } else {
+                                    row.innerHTML += `<td>0</td>`;
+                                }
                             });
 
                         tbody.appendChild(row);
                     });
             });
+
+        // Add click event listeners to all clickable counts
+        document.querySelectorAll('.clickable-count').forEach(cell => {
+            cell.addEventListener('click', function() {
+                showTicketDetails(
+                    this.getAttribute('data-sector'),
+                    this.getAttribute('data-status'),
+                    this.getAttribute('data-type')
+                );
+            });
+        });
 
         // Show message if no valid data
         if (tbody.innerHTML === '') {
@@ -495,6 +574,50 @@
                 </tr>
             `;
         }
+    }
+
+    function showTicketDetails(sector, status, type) {
+        // Filter tickets based on the clicked criteria
+        const filteredTickets = allTicketData.filter(ticket => {
+            return ticket.sector === sector && 
+                   ticket.status === status && 
+                   ticket.type === type;
+        });
+
+        // Update modal title and info
+        document.getElementById('modalSector').textContent = sector;
+        document.getElementById('modalStatus').textContent = status;
+        document.getElementById('modalType').textContent = type;
+        
+        // Populate ticket list
+        const ticketList = document.getElementById('ticketList');
+        ticketList.innerHTML = '';
+        
+        if (filteredTickets.length === 0) {
+            ticketList.innerHTML = '<div class="text-center text-muted py-4">No tickets found</div>';
+        } else {
+            filteredTickets.forEach(ticket => {
+                const ticketItem = document.createElement('div');
+                ticketItem.className = 'ticket-item';
+                ticketItem.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <strong>${ticket.title || 'No Title'}</strong>
+                        <span class="badge bg-secondary">${ticket.id}</span>
+                    </div>
+                    <div class="text-muted small mb-2">Created: ${ticket.createdDate || 'Unknown'}</div>
+                    <div>${ticket.description || 'No description available'}</div>
+                    <div class="mt-2">
+                        <span class="badge bg-info">Priority: ${ticket.priority || 'Unknown'}</span>
+                        <span class="badge bg-light text-dark ms-2">Flag: ${ticket.flag || 'None'}</span>
+                    </div>
+                `;
+                ticketList.appendChild(ticketItem);
+            });
+        }
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('ticketModal'));
+        modal.show();
     }
 
     function showError(message) {

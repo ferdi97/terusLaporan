@@ -91,6 +91,7 @@
             border-radius: 10px;
             box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: 0.3s;
+            position: relative;
         }
         .input-group:hover {
             background: #e0e0e0;
@@ -125,6 +126,25 @@
             background: linear-gradient(45deg, #ff6a88, #ff9a8b);
             transform: translateY(-3px) scale(1.05);
         }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            position: absolute;
+            bottom: -18px;
+            left: 50px;
+            display: none;
+        }
+        .input-error {
+            box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        .shake {
+            animation: shake 0.5s;
+        }
     </style>
 </head>
 <body>
@@ -140,34 +160,72 @@
     </div>
     <div class="register-container" id="register-container">
         <h2>Register</h2>
-        <div class="input-group">
-            <i class="fas fa-user"></i>
-            <input type="text" placeholder="Nama CSR">
-        </div>
-        <div class="input-group">
-            <i class="fas fa-user"></i>
-            <input type="text" placeholder="Username">
-        </div>
-        <div class="input-group">
-            <i class="fas fa-lock"></i>
-            <input type="text" placeholder="Password">
-        </div>
-        <div class="input-group">
-            <i class="fas fa-lock"></i>
-            <input type="password" placeholder="Konfirmasi Password">
-        </div>
-        <div class="input-group">
-            <i class="fas fa-map-marker-alt"></i>
-            <input type="text" placeholder="Lokasi Grapari">
-        </div>
-        <button class="register-btn">Register</button>
+        <form action="end_register.php" method="POST">
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" name="nama_csr" placeholder="Nama CSR" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" name="password" placeholder="Password" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="confirm_password" name="konfirmasi_password" placeholder="Konfirmasi Password" required>
+                <span id="password_error" class="error-message">Password tidak sama!</span>
+            </div>
+            <div class="input-group" style="margin-top: 30px;">
+                <i class="fas fa-map-marker-alt"></i>
+                <input type="text" name="lokasi_grapari" placeholder="Lokasi Grapari" required>
+            </div>
+            <button type="submit" class="register-btn">Register</button>
+        </form>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Loading screen logic
             setTimeout(() => {
                 document.getElementById("loading-screen").classList.add("hidden");
                 document.getElementById("register-container").style.display = "block";
             }, 1500);
+
+            // Password validation
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirm_password');
+            const passwordError = document.getElementById('password_error');
+            const form = document.querySelector('form');
+
+            function validatePassword() {
+                if (password.value !== confirmPassword.value && confirmPassword.value !== '') {
+                    confirmPassword.classList.add('input-error');
+                    passwordError.style.display = 'block';
+                    return false;
+                } else {
+                    confirmPassword.classList.remove('input-error');
+                    passwordError.style.display = 'none';
+                    return true;
+                }
+            }
+
+            // Real-time validation
+            confirmPassword.addEventListener('input', validatePassword);
+            password.addEventListener('input', validatePassword);
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                if (!validatePassword()) {
+                    e.preventDefault();
+                    // Animasi shake untuk memberi feedback visual
+                    confirmPassword.classList.add('shake');
+                    setTimeout(() => {
+                        confirmPassword.classList.remove('shake');
+                    }, 500);
+                }
+            });
         });
     </script>
 </body>
