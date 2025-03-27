@@ -261,7 +261,7 @@ $jsonData = json_encode([
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Ticket Statistics</h5>
-                <small class="text-light">Last updated: <?php echo date('d M Y H:i'); ?></small>
+                <small class="text-light">Last updated: <?php date_default_timezone_set('Asia/Makassar'); echo date('d M Y H:i'); ?></small>
             </div>
             <div class="card-body">
                 <div class="row stats-row">

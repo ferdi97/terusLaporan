@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("ssss", $nama_csr, $username, $hashed_password, $lokasi_grapari);
         
         if ($stmt->execute()) {
-            echo "<script>alert('Registrasi berhasil!'); window.location='index.html';</script>";
+            echo "<script>alert('Registrasi berhasil!'); window.location='index.php';</script>";
         } else {
             echo "Error: " . $stmt->error;
         }
