@@ -16,10 +16,21 @@ $data = json_decode($response, true);
 $headers = $data['values'][0] ?? [];
 $rows = array_slice($data['values'], 1);
 
-// Prepare filter options
+// Prepare filter options and statistics
 $filterOptions = array_fill(0, count($headers), []);
+$statistics = [
+    'status' => [],
+    'priority' => [],
+    'type' => []
+];
+
+// Determine column indices for statistics
+$statusCol = array_search('STATUS', $headers);
+$priorityCol = array_search('PRIORITY', $headers);
+$typeCol = array_search('TICKET_TYPE', $headers);
 
 foreach ($rows as $row) {
+    // Prepare filter options
     foreach ($headers as $index => $header) {
         if (isset($row[$index])) {
             $value = trim($row[$index]);
@@ -28,18 +39,44 @@ foreach ($rows as $row) {
             }
         }
     }
+    
+    // Collect statistics
+    if ($statusCol !== false && isset($row[$statusCol])) {
+        $status = $row[$statusCol];
+        $statistics['status'][$status] = ($statistics['status'][$status] ?? 0) + 1;
+    }
+    
+    if ($priorityCol !== false && isset($row[$priorityCol])) {
+        $priority = $row[$priorityCol];
+        $statistics['priority'][$priority] = ($statistics['priority'][$priority] ?? 0) + 1;
+    }
+    
+    if ($typeCol !== false && isset($row[$typeCol])) {
+        $type = $row[$typeCol];
+        $statistics['type'][$type] = ($statistics['type'][$type] ?? 0) + 1;
+    }
 }
 
-// Sort filter options
+// Sort filter options and statistics
 foreach ($filterOptions as &$options) {
     sort($options);
+}
+
+foreach ($statistics as &$stats) {
+    arsort($stats);
 }
 
 // Store data in JSON format for JavaScript
 $jsonData = json_encode([
     'headers' => $headers,
     'rows' => $rows,
-    'filterOptions' => $filterOptions
+    'filterOptions' => $filterOptions,
+    'statistics' => $statistics,
+    'columnMap' => [
+        'status' => $statusCol,
+        'priority' => $priorityCol,
+        'type' => $typeCol
+    ]
 ]);
 ?>
 <!DOCTYPE html>
@@ -47,7 +84,7 @@ $jsonData = json_encode([
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Report | Optimized Viewer</title>
+    <title>Ticket System | Interactive Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -73,6 +110,7 @@ $jsonData = json_encode([
             border: none;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
         }
         
         .card-header {
@@ -80,6 +118,33 @@ $jsonData = json_encode([
             color: white;
             padding: 12px 20px;
             border-radius: 8px 8px 0 0 !important;
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card.active {
+            background-color: #e3f2fd;
+            border-left: 4px solid #1565c0;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
         }
         
         .search-container {
@@ -163,6 +228,15 @@ $jsonData = json_encode([
             color: #ccc;
         }
         
+        .stats-row {
+            margin-bottom: 15px;
+        }
+        
+        .badge-filter {
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
         @media (max-width: 768px) {
             .container-fluid {
                 padding: 10px;
@@ -175,6 +249,10 @@ $jsonData = json_encode([
             .search-container {
                 padding: 10px;
             }
+            
+            .stat-card {
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
@@ -182,8 +260,45 @@ $jsonData = json_encode([
     <div class="container-fluid">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Data Report</h5>
+                <h5 class="mb-0">Ticket Statistics</h5>
                 <small class="text-light">Last updated: <?php echo date('d M Y H:i'); ?></small>
+            </div>
+            <div class="card-body">
+                <div class="row stats-row">
+                    <div class="col-md-12">
+                        <h6><i class="bi bi-check-circle"></i> By Status</h6>
+                        <div class="row" id="statusStats">
+                            <!-- Status statistics will be inserted by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row stats-row">
+                    <div class="col-md-12">
+                        <h6><i class="bi bi-exclamation-triangle"></i> By Priority</h6>
+                        <div class="row" id="priorityStats">
+                            <!-- Priority statistics will be inserted by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row stats-row">
+                    <div class="col-md-12">
+                        <h6><i class="bi bi-tag"></i> By Type</h6>
+                        <div class="row" id="typeStats">
+                            <!-- Type statistics will be inserted by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Ticket Data</h5>
+                <div id="activeFilters">
+                    <!-- Active filters will be shown here -->
+                </div>
             </div>
             <div class="search-container">
                 <div class="row">
@@ -196,6 +311,9 @@ $jsonData = json_encode([
                     <div class="col-md-6 d-flex align-items-center">
                         <button id="applyFilters" class="btn btn-primary btn-sm me-2">
                             <i class="bi bi-funnel"></i> Apply Filters
+                        </button>
+                        <button id="resetFilters" class="btn btn-outline-secondary btn-sm me-2">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
                         </button>
                         <span id="resultCount" class="result-count">No filters applied</span>
                     </div>
@@ -210,7 +328,7 @@ $jsonData = json_encode([
                 <div class="empty-state" id="emptyState">
                     <i class="bi bi-database"></i>
                     <h5>No data displayed</h5>
-                    <p>Apply filters or search to view data</p>
+                    <p>Click on statistics or apply filters to view data</p>
                 </div>
                 
                 <div class="table-responsive d-none" id="tableContainer">
@@ -238,6 +356,7 @@ $jsonData = json_encode([
             let filteredData = [];
             let currentFilters = {};
             let currentSearch = '';
+            let activeStatFilter = null;
             
             // Initialize the table headers
             function initTableHeaders() {
@@ -257,6 +376,99 @@ $jsonData = json_encode([
                 });
                 $('#tableHeaders').html(headersHtml);
             }
+            
+            // Initialize statistics cards
+            function initStatistics() {
+                renderStatCards('status', appData.statistics.status);
+                renderStatCards('priority', appData.statistics.priority);
+                renderStatCards('type', appData.statistics.type);
+            }
+            
+            // Render statistic cards
+            function renderStatCards(type, stats) {
+                const container = $(`#${type}Stats`);
+                container.empty();
+                
+                for (const [name, count] of Object.entries(stats)) {
+                    container.append(`
+                        <div class="col-md-3 col-sm-6 mb-3 stat-card" 
+                             data-type="${type}" 
+                             data-value="${escapeHtml(name)}"
+                             title="Click to filter ${type}: ${escapeHtml(name)}">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <div class="stat-value">${count}</div>
+                                    <div class="stat-label">${escapeHtml(name)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                }
+                
+                // Add click handlers
+                $(`.stat-card[data-type="${type}"]`).on('click', function() {
+                    const filterType = $(this).data('type');
+                    const filterValue = $(this).data('value');
+                    
+                    // Set as active filter
+                    setStatFilter(filterType, filterValue);
+                });
+            }
+            
+            // Set statistic filter
+            function setStatFilter(type, value) {
+                // Clear other stat filters
+                $('.stat-card').removeClass('active');
+                $(`.stat-card[data-type="${type}"][data-value="${value}"]`).addClass('active');
+                
+                // Set the filter
+                const colIndex = appData.columnMap[type];
+                if (colIndex !== undefined && colIndex !== false) {
+                    activeStatFilter = { type, index: colIndex, value: value };
+                    
+                    // Reset other filters
+                    currentFilters = {};
+                    $('.filter-select').val('');
+                    $('#globalSearch').val('');
+                    currentSearch = '';
+                    
+                    // Set the stat filter
+                    currentFilters[colIndex] = value.toLowerCase();
+                    filterData();
+                    
+                    // Update active filters display
+                    updateActiveFilters();
+                }
+            }
+            
+            // Update active filters display
+            function updateActiveFilters() {
+                const activeFiltersContainer = $('#activeFilters');
+                activeFiltersContainer.empty();
+                
+                if (activeStatFilter) {
+                    const filterName = appData.headers[activeStatFilter.index];
+                    activeFiltersContainer.append(`
+                        <div class="d-flex align-items-center">
+                            <span class="me-2">Active filter:</span>
+                            <span class="badge bg-primary">
+                                ${filterName}: ${activeStatFilter.value}
+                                <i class="bi bi-x-circle ms-2" onclick="clearStatFilter()"></i>
+                            </span>
+                        </div>
+                    `);
+                }
+            }
+            
+            // Clear statistic filter
+            window.clearStatFilter = function() {
+                activeStatFilter = null;
+                $('.stat-card').removeClass('active');
+                currentFilters = {};
+                filterData();
+                updateActiveFilters();
+                $('#resultCount').text('No filters applied');
+            };
             
             // Render table rows
             function renderTableRows(rows) {
@@ -341,6 +553,12 @@ $jsonData = json_encode([
                     countText = `Showing all ${totalRecords} records`;
                 } else {
                     countText = `Showing ${shownRecords} of ${totalRecords} records`;
+                    
+                    // Add filter info if from stat click
+                    if (activeStatFilter) {
+                        const filterName = appData.headers[activeStatFilter.index];
+                        countText += ` (Filtered by ${filterName}: ${activeStatFilter.value})`;
+                    }
                 }
                 
                 $('#resultCount').text(countText);
@@ -349,6 +567,7 @@ $jsonData = json_encode([
             // Initialize the application
             function init() {
                 initTableHeaders();
+                initStatistics();
                 $('#initialLoading').hide();
                 
                 // Show empty state initially
@@ -357,6 +576,10 @@ $jsonData = json_encode([
             
             // Event handlers
             $('#applyFilters').on('click', function() {
+                activeStatFilter = null;
+                $('.stat-card').removeClass('active');
+                updateActiveFilters();
+                
                 currentFilters = {};
                 $('.filter-select').each(function() {
                     const index = $(this).data('index');
@@ -367,6 +590,14 @@ $jsonData = json_encode([
                 });
                 
                 currentSearch = $('#globalSearch').val().toLowerCase();
+                filterData();
+            });
+            
+            $('#resetFilters').on('click', function() {
+                clearStatFilter();
+                $('.filter-select').val('');
+                $('#globalSearch').val('');
+                currentSearch = '';
                 filterData();
             });
             

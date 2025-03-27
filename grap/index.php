@@ -1,17 +1,10 @@
 <?php
 session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 // Koneksi ke database
-$host = "localhost";
-$username = "root";
-$password = "";
-$database = "db_keluhan";
-
-$conn = new mysqli($host, $username, $password, $database);
-
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
-}
+include "../api/conec.php";
 
 // Proses login
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

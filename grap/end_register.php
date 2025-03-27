@@ -1,16 +1,6 @@
 <?php
 // Koneksi ke database
-$host = "localhost";
-$username = "root"; // Default XAMPP
-$password = ""; // Default XAMPP kosong
-$database = "db_keluhan"; // Sesuaikan dengan nama database Anda
-
-$conn = new mysqli($host, $username, $password, $database);
-
-// Cek koneksi
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
-}
+include "../api/conec.php";
 
 // Proses form jika metode POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

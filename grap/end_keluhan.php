@@ -8,16 +8,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 // Koneksi ke database
-$host = "localhost";
-$username = "root";
-$password = "";
-$database = "db_keluhan";
-
-$conn = new mysqli($host, $username, $password, $database);
-
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
-}
+include "../api/conec.php";
 
 // Ambil data dari form
 $nama_csr = htmlspecialchars($_POST['nama_csr']);
