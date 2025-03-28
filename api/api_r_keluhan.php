@@ -30,8 +30,8 @@ try {
                 no_hp,
                 alamat,
                 keluhan,
-                SUBSTRING_INDEX(share_location, ',', 1) AS latitude,
-                SUBSTRING_INDEX(share_location, ',', -1) AS longitude,
+                SUBSTRING_INDEX(latitude, ',', 1) AS latitude,
+                SUBSTRING_INDEX(longitude, ',', -1) AS longitude,
                 tanggal_input
             FROM keluhan_pelanggan
             ORDER BY tanggal_keluhan DESC";
