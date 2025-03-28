@@ -212,7 +212,7 @@ $id_tiket = 'CSR' . str_pad(mt_rand(1, 999999999), 9, '0', STR_PAD_LEFT);
                                 <i class="fas fa-sync-alt"></i>
                             </button>
                         </div>
-                    </div>
+                    </div>      
                 </div>
                 <div class="form-col">
                     <div class="form-group">

@@ -1,0 +1,61 @@
+<?php
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+
+// Koneksi ke database
+$servername = "localhost";
+$username = "u545755515_algoritma";
+$password = "Algoritma97";
+$dbname = "u545755515_db_keluhan";
+
+// Membuat koneksi
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Cek koneksi
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(["message" => "Koneksi database gagal: " . $conn->connect_error]);
+    exit();
+}
+
+// Set timezone ke WITA
+date_default_timezone_set('Asia/Makassar');
+
+// Query untuk mengambil data keluhan
+$sql = "SELECT 
+            kd_tiket AS id_tiket,
+            nama_csr,
+            lokasi_grapari,
+            nomor_internet AS no_internet,
+            nama_pelapor AS nama_pelanggan,
+            no_hp_pelapor AS no_hp,
+            alamat_lengkap AS alamat,
+            keluhan,
+            SUBSTRING_INDEX(share_location, ',', 1) AS latitude,
+            SUBSTRING_INDEX(share_location, ',', -1) AS longitude,
+            tanggal_keluhan AS waktu_input
+        FROM tabel_keluhan
+        ORDER BY tanggal_keluhan DESC";
+
+$result = $conn->query($sql);
+
+$response = array();
+
+if ($result->num_rows > 0) {
+    // Output data setiap baris
+    while($row = $result->fetch_assoc()) {
+        // Format ulang tanggal
+        $row['waktu_input'] = date('d-m-Y H:i:s', strtotime($row['waktu_input']));
+        
+        $response[] = $row;
+    }
+    
+    http_response_code(200);
+    echo json_encode($response);
+} else {
+    http_response_code(404);
+    echo json_encode(["message" => "Tidak ada data keluhan ditemukan"]);
+}
+
+$conn->close();
+?>
