@@ -22,17 +22,17 @@ try {
 
     // Query untuk mengambil data keluhan
     $sql = "SELECT 
-                kd_tiket AS id_tiket,
+                id_tiket AS id_tiket,
                 nama_csr,
                 lokasi_grapari,
-                nomor_internet AS no_internet,
-                nama_pelapor AS nama_pelanggan,
-                no_hp_pelapor AS no_hp,
-                alamat_lengkap AS alamat,
+                no_internet,
+                nama_pelanggan,
+                no_hp,
+                alamat,
                 keluhan,
                 SUBSTRING_INDEX(share_location, ',', 1) AS latitude,
                 SUBSTRING_INDEX(share_location, ',', -1) AS longitude,
-                tanggal_keluhan AS tanggal_input
+                tanggal_input
             FROM keluhan_pelanggan
             ORDER BY tanggal_keluhan DESC";
 
