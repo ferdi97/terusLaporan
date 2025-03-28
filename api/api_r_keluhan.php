@@ -34,7 +34,7 @@ try {
                 SUBSTRING_INDEX(longitude, ',', -1) AS longitude,
                 tanggal_input
             FROM keluhan_pelanggan
-            ORDER BY tanggal_keluhan DESC";
+            ORDER BY tanggal_input DESC";
 
     $result = $conn->query($sql);
 
