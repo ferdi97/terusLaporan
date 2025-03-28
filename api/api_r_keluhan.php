@@ -33,8 +33,8 @@ $sql = "SELECT
             keluhan,
             SUBSTRING_INDEX(share_location, ',', 1) AS latitude,
             SUBSTRING_INDEX(share_location, ',', -1) AS longitude,
-            tanggal_keluhan AS waktu_input
-        FROM tabel_keluhan
+            tanggal_keluhan AS tanggal_input
+        FROM keluhan_pelanggan
         ORDER BY tanggal_keluhan DESC";
 
 $result = $conn->query($sql);
