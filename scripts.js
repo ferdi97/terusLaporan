@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const keluhan = document.getElementById("keluhan-gangguan").value;
         const shareLocation = document.getElementById("share-location").value;
         const kdTiket = document.getElementById("kd-tiket").value;
-
+    
         fetch('insert_data.php', {
             method: 'POST',
             headers: {
@@ -132,16 +132,148 @@ document.addEventListener("DOMContentLoaded", function() {
                 kd_tiket: kdTiket
             })
         })
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
-            alert(data);
-            form.reset();
-            document.getElementById("submit-button").textContent = "Simpan";
-            generateKdTiket();  // Regenerate KD TIKET for next entry
+            if (data.status === 'success') {
+                showSummaryModal(data.data);
+                form.reset();
+                generateKdTiket();
+            } else {
+                console.error('Server error:', data.message);
+                alert('Error: ' + data.message);
+            }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Fetch error:', error);
+            alert('Terjadi kesalahan saat mengirim data. Silakan coba lagi atau hubungi administrator.');
         });
+    }
+    
+    function showSummaryModal(data) {
+        // Create modal element
+        const modal = document.createElement('div');
+        modal.className = 'summary-modal';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '1000';
+    
+        // Create modal content
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
+        modalContent.style.backgroundColor = '#fff';
+        modalContent.style.padding = '20px';
+        modalContent.style.borderRadius = '10px';
+        modalContent.style.maxWidth = '600px';
+        modalContent.style.width = '90%';
+        modalContent.style.maxHeight = '80vh';
+        modalContent.style.overflowY = 'auto';
+    
+        // Create close button
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'Tutup';
+        closeButton.style.marginTop = '20px';
+        closeButton.style.padding = '10px 20px';
+        closeButton.style.backgroundColor = '#4CAF50';
+        closeButton.style.color = 'white';
+        closeButton.style.border = 'none';
+        closeButton.style.borderRadius = '5px';
+        closeButton.style.cursor = 'pointer';
+        closeButton.onclick = function() {
+            document.body.removeChild(modal);
+        };
+    
+        // Create copy button
+        const copyButton = document.createElement('button');
+        copyButton.textContent = 'Salin Data';
+        copyButton.style.marginTop = '20px';
+        copyButton.style.marginRight = '10px';
+        copyButton.style.padding = '10px 20px';
+        copyButton.style.backgroundColor = '#2196F3';
+        copyButton.style.color = 'white';
+        copyButton.style.border = 'none';
+        copyButton.style.borderRadius = '5px';
+        copyButton.style.cursor = 'pointer';
+        copyButton.onclick = function() {
+            copyToClipboard(data);
+        };
+    
+        // Create summary content
+        const summaryTitle = document.createElement('h2');
+        summaryTitle.textContent = 'Ringkasan Laporan Anda';
+        summaryTitle.style.textAlign = 'center';
+        summaryTitle.style.marginBottom = '20px';
+    
+        const summaryMessage = document.createElement('p');
+        summaryMessage.textContent = 'Terima kasih atas laporan yang Anda kirimkan. Berikut adalah detail laporan Anda:';
+        summaryMessage.style.marginBottom = '20px';
+    
+        const summaryData = document.createElement('div');
+        summaryData.style.marginBottom = '20px';
+        
+        // Format the data for display
+        const formattedData = `
+            <p><strong>ID Tiket:</strong> ${data.kd_tiket}</p>
+            <p><strong>Nomor Internet:</strong> ${data.nomor_internet}</p>
+            <p><strong>Nama Pelapor:</strong> ${data.nama_pelapor}</p>
+            <p><strong>No HP Pelapor:</strong> ${data.no_hp_pelapor}</p>
+            <p><strong>Alamat Lengkap:</strong> ${data.alamat_lengkap}</p>
+            <p><strong>Keluhan:</strong> ${data.keluhan}</p>
+            <p><strong>Lokasi:</strong> ${data.share_location}</p>
+            <p><strong>Tanggal Laporan:</strong> ${data.tanggal_keluhan}</p>
+        `;
+        summaryData.innerHTML = formattedData;
+    
+        // Add elements to modal
+        modalContent.appendChild(summaryTitle);
+        modalContent.appendChild(summaryMessage);
+        modalContent.appendChild(summaryData);
+        
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.display = 'flex';
+        buttonContainer.style.justifyContent = 'center';
+        buttonContainer.appendChild(copyButton);
+        buttonContainer.appendChild(closeButton);
+        
+        modalContent.appendChild(buttonContainer);
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+    }
+    
+    function copyToClipboard(data) {
+        // Format the data for copying
+        const textToCopy = `
+    ID Tiket: ${data.kd_tiket}
+    Nomor Internet: ${data.nomor_internet}
+    Nama Pelapor: ${data.nama_pelapor}
+    No HP Pelapor: ${data.no_hp_pelapor}
+    Alamat Lengkap: ${data.alamat_lengkap}
+    Keluhan: ${data.keluhan}
+    Lokasi: ${data.share_location}
+    Tanggal Laporan: ${data.tanggal_keluhan}
+        `;
+    
+        // Create a temporary textarea element
+        const textarea = document.createElement('textarea');
+        textarea.value = textToCopy;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    
+        // Show a brief notification
+        alert('Data telah disalin ke clipboard!');
     }
 
     function generateKdTiket() {

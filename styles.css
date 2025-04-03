@@ -280,4 +280,98 @@ button:active {
     }
 }
 
+/* Modal Styles */
+.summary-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    box-sizing: border-box;
+}
 
+.modal-content {
+    background-color: white;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.summary-data {
+    margin: 20px 0;
+    border-top: 1px solid #ecf0f1;
+    border-bottom: 1px solid #ecf0f1;
+    padding: 15px 0;
+}
+
+.data-row {
+    display: flex;
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.data-label {
+    font-weight: bold;
+    color: #7f8c8d;
+    min-width: 120px;
+}
+
+.data-value {
+    color: #2c3e50;
+    flex-grow: 1;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-buttons button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.modal-buttons button:active {
+    transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .modal-buttons {
+        flex-direction: column;
+    }
+    
+    .data-row {
+        flex-direction: column;
+    }
+    
+    .data-label {
+        margin-bottom: 5px;
+    }
+}
