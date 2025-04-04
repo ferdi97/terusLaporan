@@ -3,12 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- In index.php head section -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lapor Gangguan</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="styles.css">
-    <script>
+    <!-- <script>
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
         });
@@ -31,7 +32,7 @@
                 e.preventDefault();
             }
         });
-    </script>
+    </script> -->
 </head>
 
 <body>

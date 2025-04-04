@@ -108,51 +108,51 @@ document.addEventListener("DOMContentLoaded", function() {
         return true;
     }
 
-    function saveData() {
-        const nomorInternet = document.getElementById("nomor-internet").value;
-        const namaPelapor = document.getElementById("nama-pelapor").value;
-        const noHpPelapor = document.getElementById("no-hp-pelapor").value;
-        const alamatLengkap = document.getElementById("alamat-lengkap").value;
-        const keluhan = document.getElementById("keluhan-gangguan").value;
-        const shareLocation = document.getElementById("share-location").value;
-        const kdTiket = document.getElementById("kd-tiket").value;
+    // function saveData() {
+    //     const nomorInternet = document.getElementById("nomor-internet").value;
+    //     const namaPelapor = document.getElementById("nama-pelapor").value;
+    //     const noHpPelapor = document.getElementById("no-hp-pelapor").value;
+    //     const alamatLengkap = document.getElementById("alamat-lengkap").value;
+    //     const keluhan = document.getElementById("keluhan-gangguan").value;
+    //     const shareLocation = document.getElementById("share-location").value;
+    //     const kdTiket = document.getElementById("kd-tiket").value;
     
-        fetch('insert_data.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                nomor_internet: nomorInternet,
-                nama_pelapor: namaPelapor,
-                no_hp_pelapor: noHpPelapor,
-                alamat_lengkap: alamatLengkap,
-                keluhan: keluhan,
-                share_location: shareLocation,
-                kd_tiket: kdTiket
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.status === 'success') {
-                showSummaryModal(data.data);
-                form.reset();
-                generateKdTiket();
-            } else {
-                console.error('Server error:', data.message);
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Fetch error:', error);
-            alert('Terjadi kesalahan saat mengirim data. Silakan coba lagi atau hubungi administrator.');
-        });
-    }
+    //     fetch('insert_data.php', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify({
+    //             nomor_internet: nomorInternet,
+    //             nama_pelapor: namaPelapor,
+    //             no_hp_pelapor: noHpPelapor,
+    //             alamat_lengkap: alamatLengkap,
+    //             keluhan: keluhan,
+    //             share_location: shareLocation,
+    //             kd_tiket: kdTiket
+    //         })
+    //     })
+    //     .then(response => {
+    //         if (!response.ok) {
+    //             throw new Error('Network response was not ok');
+    //         }
+    //         return response.json();
+    //     })
+    //     .then(data => {
+    //         if (data.status === 'success') {
+    //             showSummaryModal(data.data);
+    //             form.reset();
+    //             generateKdTiket();
+    //         } else {
+    //             console.error('Server error:', data.message);
+    //             alert('Error: ' + data.message);
+    //         }
+    //     })
+    //     .catch(error => {
+    //         console.error('Fetch error:', error);
+    //         alert('Terjadi kesalahan saat mengirim data. Silakan coba lagi atau hubungi administrator.');
+    //     });
+    // }
     
     function saveData() {
         const nomorInternet = document.getElementById("nomor-internet").value;
@@ -204,7 +204,17 @@ document.addEventListener("DOMContentLoaded", function() {
         // Create modal element
         const modal = document.createElement('div');
         modal.className = 'summary-modal';
-        
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.right = '0';
+        modal.style.bottom = '0';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        modal.style.zIndex = '1000';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.padding = '20px';
         // Create modal content
         const modalContent = document.createElement('div');
         modalContent.className = 'modal-content';
