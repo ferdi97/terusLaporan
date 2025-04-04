@@ -14,7 +14,7 @@ if (!$data) {
 }
 
 // Format data
-$tanggal_keluhan = date('d-m-Y H:i:s'); // Format tanggal baru
+$tanggal_keluhan = date('Y-m-d H:i:s'); // Format tanggal baru
 
 try {
     $stmt = $conn->prepare("INSERT INTO keluhan 
