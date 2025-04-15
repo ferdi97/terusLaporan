@@ -316,8 +316,9 @@ document.addEventListener("DOMContentLoaded", function() {
     function copyReportData(data) {
                 const mapsUrl = `https://www.google.com/maps?q=${data.share_location.replace(/\s/g, '')}`;
                 
-                const reportText = `LAPORAN GANGGUAN INDIHOME
-        =========================
+                const reportText = 
+        ` LAPORAN GANGGUAN INDIHOME
+        =============================
         ID Tiket: ${data.kd_tiket}
         Nomor Internet: ${data.nomor_internet}
         Nama Pelapor: ${data.nama_pelapor}

@@ -140,6 +140,15 @@
             transform: rotate(180deg);
             text-align: center;
             padding: 1rem 0.5rem;
+        } /* Add this new style to existing styles */
+        .clickable-ticket-count {
+            cursor: pointer;
+            color: var(--primary-color);
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .clickable-ticket-count:hover {
+            text-decoration: underline;
         }
 
         .clickable-count {
@@ -164,6 +173,56 @@
 
         .ticket-item:last-child {
             border-bottom: none;
+        }
+
+        /* New styles for technician table */
+        .technician-table th {
+            white-space: nowrap;
+            position: relative;
+        }
+        .technician-table td {
+            vertical-align: middle;
+        }
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+        }
+        .progress-bar {
+            background-color: var(--primary-color);
+        }
+        .table-controls {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .sortable-header {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sortable-header:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        .sort-icon {
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+        .active-sort {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        .active-sort .sort-icon {
+            opacity: 1;
+        }
+        .filter-dropdown {
+            min-width: 200px;
+        }
+        .badge-type {
+            background-color: #e9ecef;
+            color: #495057;
+            margin-right: 4px;
+            margin-bottom: 4px;
+            display: inline-block;
         }
 
         @media (max-width: 768px) {
@@ -225,7 +284,7 @@
             </div>
         </div>
 
-        <div class="row g-4">
+        <div class="row g-4 mb-4">
             <div class="col-12">
                 <div class="card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -248,6 +307,78 @@
                                 <!-- Dynamic table content -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Technician Productivity Table -->
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Detail Produktivitas Teknisi</h5>
+                        <div class="text-muted small">Updated: Just now</div>
+                    </div>
+                    
+                    <!-- Table Controls -->
+                    <div class="table-controls">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" id="technicianSearch" class="form-control" placeholder="Search technicians...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="sectorFilter" class="form-select">
+                                    <option value="">All Sectors</option>
+                                    <!-- Sectors will be populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="statusFilter" class="form-select">
+                                    <option value="">All Statuses</option>
+                                    <option value="high">High Productivity (>75%)</option>
+                                    <option value="medium">Medium Productivity (25-75%)</option>
+                                    <option value="low">Low Productivity (<25%)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button id="resetFilters" class="btn btn-outline-secondary w-100">
+                                    <i class="fas fa-undo me-1"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table technician-table">
+                            <thead>
+                                <tr>
+                                    <th class="sortable-header" data-sort="nik">NIK <i class="fas fa-sort sort-icon"></i></th>
+                                    <th class="sortable-header" data-sort="name">Nama Teknisi <i class="fas fa-sort sort-icon"></i></th>
+                                    <th class="sortable-header" data-sort="sector">Sektor <i class="fas fa-sort sort-icon"></i></th>
+                                    <th class="sortable-header" data-sort="total">Total Tiket <i class="fas fa-sort sort-icon"></i></th>
+                                    <th>Jenis Tiket</th>
+                                    <th>Saldo Tiket</th>
+                                    <th class="sortable-header" data-sort="closed">Tiket Selesai <i class="fas fa-sort sort-icon"></i></th>
+                                    <th class="sortable-header" data-sort="percentage">Persentase <i class="fas fa-sort sort-icon"></i></th>
+                                    <th>Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody id="technicianTableBody">
+                                <!-- Dynamic technician data will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="text-muted small" id="technicianCount">Showing 0 technicians</div>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-primary" id="exportTechnicianData">
+                                <i class="fas fa-file-export me-1"></i> Export Data
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -281,358 +412,680 @@
 
 <script>
     const API_KEY = "AIzaSyDFdaSruBmI5mqA48IdCDeJvlnUppiJ5jA";
-    const SPREADSHEET_ID = "1cNEzrgnhuijPC-qCR8UKG-NzRFVcpUF9i3gOG3anoU4";
-    const RANGE = "MASTER_DATA!A1:V";
-    let allTicketData = []; // Store all ticket data for filtering
+const SPREADSHEET_ID = "1cNEzrgnhuijPC-qCR8UKG-NzRFVcpUF9i3gOG3anoU4";
+const RANGE = "MASTER_DATA!A1:V";
+let allTicketData = [];
 
-    async function fetchData() {
-        try {
-            const response = await fetch(
-                `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`
-            );
-            const data = await response.json();
-            processData(data.values);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            showError("Failed to fetch data. Please check your connection.");
-        }
+async function fetchData() {
+    try {
+        const response = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`
+        );
+        const data = await response.json();
+        processData(data.values);
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        showError("Failed to fetch data. Please check your connection.");
+    }
+}
+
+function processData(rows) {
+    if (!rows || rows.length === 0) {
+        showError("No data available from the source.");
+        return;
     }
 
-    function processData(rows) {
-        if (!rows || rows.length === 0) {
-            showError("No data available from the source.");
+    const headers = rows[0];
+    allTicketData = rows.slice(1).map(row => {
+        return {
+            id: row[0],
+            ReportDate: row[1],
+            BookingDate: row[2],
+            HdCreate: row[5],
+            teknisiAssign: row[4],  // Column 3 (0-based index 4)
+            teknisiClose: row[20],   // Column 19 (0-based index 20)
+            type: row[6] || 'Unknown',
+            flag: row[8],
+            sector: row[9] || '',
+            status: row[16] || 'Unknown',
+        };
+    });
+    
+    const processedData = {
+        sectors: {},
+        types: new Set(),
+        statusCounts: { SISA: 0, PENDING: 0, CLOSE: 0 },
+        detailed: {},
+        technicians: {},
+        allSectors: new Set()
+    };
+
+    allTicketData.forEach(ticket => {
+        const { sector, type, status, teknisiAssign, teknisiClose } = ticket;
+
+        if (sector.trim() !== '') {
+            processedData.allSectors.add(sector);
+        }
+
+        if (sector.trim() === '') {
             return;
         }
 
-        const headers = rows[0];
-        allTicketData = rows.slice(1).map(row => {
-            return {
-                id: row[0],
-                title: row[1],
-                description: row[2],
-                createdDate: row[3],
-                priority: row[4],
-                type: row[6] || 'Unknown',
-                flag: row[8],
-                sector: row[9] || '',
-                status: row[16] || 'Unknown',
-                // Add other fields as needed
-            };
-        });
+        if (status === 'SISA' || status === 'PENDING' || status === 'CLOSE') {
+            processedData.statusCounts[status]++;
+        }
+
+        processedData.types.add(type);
+
+        if (!processedData.sectors[sector]) {
+            processedData.sectors[sector] = {};
+        }
         
-        const processedData = {
-            sectors: {},
-            types: new Set(),
-            statusCounts: { SISA: 0, PENDING: 0, CLOSE: 0 },
-            detailed: {}
-        };
+        if (!processedData.sectors[sector][status]) {
+            processedData.sectors[sector][status] = {};
+        }
 
-        allTicketData.forEach(ticket => {
-            const { sector, type, status } = ticket;
+        if (!processedData.sectors[sector][status][type]) {
+            processedData.sectors[sector][status][type] = 0;
+        }
+        
+        processedData.sectors[sector][status][type]++;
 
-            // Skip empty sector data
-            if (sector.trim() === '') {
-                return;
-            }
-
-            // Count statuses
-            if (status === 'SISA' || status === 'PENDING' || status === 'CLOSE') {
-                processedData.statusCounts[status]++;
-            }
-
-            processedData.types.add(type);
-
-            if (!processedData.sectors[sector]) {
-                processedData.sectors[sector] = {};
+        // Process technician data
+        if (teknisiAssign) {
+            if (!processedData.technicians[teknisiAssign]) {
+                processedData.technicians[teknisiAssign] = {
+                    nik: teknisiAssign.split(' ')[0] || teknisiAssign,
+                    name: teknisiAssign,
+                    sector: sector,
+                    totalTickets: 0,
+                    ticketTypes: new Set(),
+                    typeCounts: {},
+                    sisaTickets: 0,
+                    sisaTypeCounts: {},
+                    closedTickets: 0,
+                    closedBySelf: 0
+                };
             }
             
-            if (!processedData.sectors[sector][status]) {
-                processedData.sectors[sector][status] = {};
+            processedData.technicians[teknisiAssign].totalTickets++;
+            processedData.technicians[teknisiAssign].ticketTypes.add(type);
+            
+            if (!processedData.technicians[teknisiAssign].typeCounts[type]) {
+                processedData.technicians[teknisiAssign].typeCounts[type] = 0;
             }
-
-            if (!processedData.sectors[sector][status][type]) {
-                processedData.sectors[sector][status][type] = 0;
+            processedData.technicians[teknisiAssign].typeCounts[type]++;
+            
+            if (status === 'SISA') {
+                processedData.technicians[teknisiAssign].sisaTickets++;
+                if (!processedData.technicians[teknisiAssign].sisaTypeCounts[type]) {
+                    processedData.technicians[teknisiAssign].sisaTypeCounts[type] = 0;
+                }
+                processedData.technicians[teknisiAssign].sisaTypeCounts[type]++;
             }
             
-            processedData.sectors[sector][status][type]++;
+            if (status === 'CLOSE') {
+                processedData.technicians[teknisiAssign].closedTickets++;
+                // Only count if closed by the same technician
+                if (teknisiClose && teknisiClose.trim() === teknisiAssign.trim()) {
+                    processedData.technicians[teknisiAssign].closedBySelf++;
+                }
+            }
+        }
+    });
+
+    renderCharts(processedData);
+    populateTable(processedData);
+    populateTechnicianTable(processedData.technicians);
+    populateSectorFilter(Array.from(processedData.allSectors).sort());
+    setupTableControls();
+}
+
+function populateSectorFilter(sectors) {
+    const select = document.getElementById('sectorFilter');
+    sectors.forEach(sector => {
+        const option = document.createElement('option');
+        option.value = sector;
+        option.textContent = sector;
+        select.appendChild(option);
+    });
+}
+
+function setupTableControls() {
+    document.getElementById('technicianSearch').addEventListener('input', filterTechnicianTable);
+    document.getElementById('sectorFilter').addEventListener('change', filterTechnicianTable);
+    document.getElementById('statusFilter').addEventListener('change', filterTechnicianTable);
+    document.getElementById('resetFilters').addEventListener('click', function() {
+        document.getElementById('technicianSearch').value = '';
+        document.getElementById('sectorFilter').value = '';
+        document.getElementById('statusFilter').value = '';
+        filterTechnicianTable();
+    });
+
+    document.querySelectorAll('.sortable-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const sortBy = this.getAttribute('data-sort');
+            const currentOrder = this.getAttribute('data-order') || 'none';
+            let newOrder = 'asc';
+            
+            if (currentOrder === 'asc') {
+                newOrder = 'desc';
+            } else if (currentOrder === 'desc') {
+                newOrder = 'none';
+            } else {
+                newOrder = 'asc';
+            }
+            
+            document.querySelectorAll('.sortable-header').forEach(h => {
+                h.classList.remove('active-sort');
+                h.setAttribute('data-order', 'none');
+                h.querySelector('.sort-icon').className = 'fas fa-sort sort-icon';
+            });
+            
+            if (newOrder !== 'none') {
+                this.classList.add('active-sort');
+                this.setAttribute('data-order', newOrder);
+                
+                const icon = this.querySelector('.sort-icon');
+                icon.className = newOrder === 'asc' 
+                    ? 'fas fa-sort-up sort-icon' 
+                    : 'fas fa-sort-down sort-icon';
+                
+                sortTechnicianTable(sortBy, newOrder);
+            } else {
+                sortTechnicianTable('total', 'desc');
+            }
         });
+    });
 
-        renderCharts(processedData);
-        populateTable(processedData);
-    }
+    document.getElementById('exportTechnicianData').addEventListener('click', exportTechnicianData);
+    sortTechnicianTable('total', 'desc');
+}
 
-    function renderCharts(data) {
-        renderStatusChart(data.statusCounts);
-        renderTypeChart(data);
-    }
-
-    function renderStatusChart(statusCounts) {
-        const ctx = document.getElementById('statusChart').getContext('2d');
+function filterTechnicianTable() {
+    const searchTerm = document.getElementById('technicianSearch').value.toLowerCase();
+    const sectorFilter = document.getElementById('sectorFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    
+    const rows = document.querySelectorAll('#technicianTableBody tr');
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        const name = row.getAttribute('data-name').toLowerCase();
+        const sector = row.getAttribute('data-sector');
+        const percentage = parseFloat(row.getAttribute('data-percentage'));
         
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['SISA', 'PENDING', 'CLOSE'],
-                datasets: [{
-                    label: 'Ticket Count',
-                    data: [
-                        statusCounts.SISA,
-                        statusCounts.PENDING,
-                        statusCounts.CLOSE
-                    ],
-                    backgroundColor: [
-                        '#ff6b35',
-                        '#3a86ff',
-                        '#2a9d8f'
-                    ],
-                    borderColor: [
-                        '#ff6b35',
-                        '#3a86ff',
-                        '#2a9d8f'
-                    ],
-                    borderWidth: 1,
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.label}: ${context.raw}`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#f8f9fa'
-                        },
-                        ticks: {
-                            stepSize: 1
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
+        const matchesSearch = name.includes(searchTerm) || 
+                            row.getAttribute('data-nik').toLowerCase().includes(searchTerm);
+        const matchesSector = !sectorFilter || sector === sectorFilter;
+        let matchesStatus = true;
+        
+        if (statusFilter === 'high') {
+            matchesStatus = percentage > 75;
+        } else if (statusFilter === 'medium') {
+            matchesStatus = percentage >= 25 && percentage <= 75;
+        } else if (statusFilter === 'low') {
+            matchesStatus = percentage < 25;
+        }
+        
+        if (matchesSearch && matchesSector && matchesStatus) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    document.getElementById('technicianCount').textContent = `Showing ${visibleCount} technicians`;
+}
+
+function sortTechnicianTable(sortBy, order) {
+    if (order === 'none') return;
+    
+    const tbody = document.getElementById('technicianTableBody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    rows.sort((a, b) => {
+        let aValue, bValue;
+        
+        switch (sortBy) {
+            case 'nik':
+                aValue = a.getAttribute('data-nik');
+                bValue = b.getAttribute('data-nik');
+                return order === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+            case 'name':
+                aValue = a.getAttribute('data-name');
+                bValue = b.getAttribute('data-name');
+                return order === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+            case 'sector':
+                aValue = a.getAttribute('data-sector');
+                bValue = b.getAttribute('data-sector');
+                return order === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+            case 'total':
+                aValue = parseInt(a.getAttribute('data-total'));
+                bValue = parseInt(b.getAttribute('data-total'));
+                return order === 'asc' ? aValue - bValue : bValue - aValue;
+            case 'closed':
+                aValue = parseInt(a.getAttribute('data-closed'));
+                bValue = parseInt(b.getAttribute('data-closed'));
+                return order === 'asc' ? aValue - bValue : bValue - aValue;
+            case 'percentage':
+                aValue = parseFloat(a.getAttribute('data-percentage'));
+                bValue = parseFloat(b.getAttribute('data-percentage'));
+                return order === 'asc' ? aValue - bValue : bValue - aValue;
+            default:
+                return 0;
+        }
+    });
+    
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function populateTechnicianTable(technicians) {
+    const tbody = document.getElementById('technicianTableBody');
+    tbody.innerHTML = '';
+
+    const technicianArray = Object.values(technicians);
+
+    if (technicianArray.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" class="text-center text-muted py-4">
+                    No technician data available
+                </td>
+            </tr>
+        `;
+        document.getElementById('technicianCount').textContent = 'Showing 0 technicians';
+        return;
+    }
+
+    technicianArray.forEach(tech => {
+        const percentage = tech.totalTickets > 0 
+            ? Math.round((tech.closedBySelf / tech.totalTickets) * 100) 
+            : 0;
+        
+        const typeBadges = Object.entries(tech.typeCounts)
+            .map(([type, count]) => 
+                `<span class="badge badge-type clickable-ticket-count" 
+                    data-technician="${tech.name}"
+                    data-type="${type}"
+                    data-status="all">${type} (${count})</span>`)
+            .join('');
+        
+        const sisaTypeCount = Object.keys(tech.sisaTypeCounts).length;
+        const sisaBadges = Object.entries(tech.sisaTypeCounts)
+            .map(([type, count]) => 
+                `<span class="badge badge-type clickable-ticket-count" 
+                    data-technician="${tech.name}"
+                    data-type="${type}"
+                    data-status="SISA">${type} (${count})</span>`)
+            .join('');
+        
+        const row = document.createElement('tr');
+        row.setAttribute('data-nik', tech.nik);
+        row.setAttribute('data-name', tech.name);
+        row.setAttribute('data-sector', tech.sector);
+        row.setAttribute('data-total', tech.totalTickets);
+        row.setAttribute('data-closed', tech.closedBySelf);
+        row.setAttribute('data-percentage', percentage);
+        
+        row.innerHTML = `
+            <td>${tech.nik || 'N/A'}</td>
+            <td>${tech.name || 'N/A'}</td>
+            <td>${tech.sector || 'N/A'}</td>
+            <td class="clickable-ticket-count" 
+                data-technician="${tech.name}"
+                data-status="all">${tech.totalTickets}</td>
+            <td>${typeBadges}</td>
+            <td>
+                ${sisaBadges || '0'}
+                <span class="clickable-ticket-count" 
+                    data-technician="${tech.name}"
+                    data-status="SISA">(${tech.sisaTickets})</span>
+            </td>
+            <td class="clickable-ticket-count" 
+                data-technician="${tech.name}"
+                data-status="CLOSE"
+                data-closeby="self">${tech.closedBySelf}</td>
+            <td>${percentage}%</td>
+            <td>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: ${percentage}%" 
+                        aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    document.querySelectorAll('.clickable-ticket-count').forEach(element => {
+        element.addEventListener('click', function() {
+            const technician = this.getAttribute('data-technician');
+            const type = this.getAttribute('data-type');
+            const status = this.getAttribute('data-status');
+            const closeBySelf = this.getAttribute('data-closeby') === 'self';
+            
+            if (type) {
+                showTechnicianTickets(technician, status, type, closeBySelf);
+            } else {
+                showTechnicianTickets(technician, status, null, closeBySelf);
+            }
+        });
+    });
+
+    document.getElementById('technicianCount').textContent = `Showing ${technicianArray.length} technicians`;
+}
+
+function showTechnicianTickets(technician, status, type = null, closeBySelf = false) {
+    const filteredTickets = allTicketData.filter(ticket => {
+        const matchesTechnician = ticket.teknisiAssign === technician;
+        const matchesStatus = status === 'all' || ticket.status === status;
+        const matchesType = !type || ticket.type === type;
+        const matchesCloseBy = !closeBySelf || 
+                             (ticket.teknisiClose && ticket.teknisiClose.trim() === technician.trim());
+        
+        return matchesTechnician && matchesStatus && matchesType && matchesCloseBy;
+    });
+
+    document.getElementById('ticketModalLabel').textContent = `Ticket Details - ${technician}`;
+    document.getElementById('modalSector').textContent = filteredTickets[0]?.sector || 'N/A';
+    document.getElementById('modalStatus').textContent = status === 'all' ? 'ALL' : status;
+    document.getElementById('modalType').textContent = type || 'ALL';
+    
+    const ticketList = document.getElementById('ticketList');
+    ticketList.innerHTML = '';
+    
+    if (filteredTickets.length === 0) {
+        ticketList.innerHTML = '<div class="text-center text-muted py-4">No tickets found</div>';
+    } else {
+        filteredTickets.forEach(ticket => {
+            const ticketItem = document.createElement('div');
+            ticketItem.className = 'ticket-item';
+            ticketItem.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <strong>${ticket.ReportDate || 'No Report Date'}</strong>
+                    <span class="badge bg-secondary">${ticket.id}</span>
+                </div>
+                <div class="text-muted small mb-2">Created: ${ticket.HdCreate || 'Unknown'}</div>
+                <div>${ticket.BookingDate || 'No Booking Date'}</div>
+                <div class="mt-2">
+                    <span class="badge bg-info">Teknisi Assign: ${ticket.teknisiAssign || 'Unknown'}</span>
+                    <span class="badge bg-success">Teknisi Close: ${ticket.teknisiClose || 'Tiket Masih Sisa'}</span>
+                    <span class="badge ${ticket.status === 'SISA' ? 'bg-warning' : ticket.status === 'CLOSE' ? 'bg-success' : 'bg-primary'}">
+                        Status: ${ticket.status}
+                    </span>
+                    <span class="badge bg-light text-dark ms-2">Type: ${ticket.type}</span>
+                    <span class="badge bg-light text-dark ms-2">Flag: ${ticket.flag || 'None'}</span>
+                </div>
+            `;
+            ticketList.appendChild(ticketItem);
+        });
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('ticketModal'));
+    modal.show();
+}
+
+function exportTechnicianData() {
+    let csv = 'NIK,Nama Teknisi,Sektor,Total Tiket,Jenis Tiket,Saldo Tiket,Tiket Selesai,Persentase\n';
+    
+    document.querySelectorAll('#technicianTableBody tr').forEach(row => {
+        if (row.style.display !== 'none') {
+            const cells = row.querySelectorAll('td');
+            const rowData = [
+                cells[0].textContent,
+                cells[1].textContent,
+                cells[2].textContent,
+                cells[3].textContent,
+                cells[4].textContent.replace(/\n/g, ' ').trim(),
+                cells[5].textContent,
+                cells[6].textContent,
+                cells[7].textContent
+            ];
+            csv += rowData.map(d => `"${d.replace(/"/g, '""')}"`).join(',') + '\n';
+        }
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'produktivitas_teknisi.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function renderCharts(data) {
+    renderStatusChart(data.statusCounts);
+    renderTypeChart(data);
+}
+
+function renderStatusChart(statusCounts) {
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['SISA', 'PENDING', 'CLOSE'],
+            datasets: [{
+                label: 'Ticket Count',
+                data: [statusCounts.SISA, statusCounts.PENDING, statusCounts.CLOSE],
+                backgroundColor: ['#ff6b35', '#3a86ff', '#2a9d8f'],
+                borderColor: ['#ff6b35', '#3a86ff', '#2a9d8f'],
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.raw}`;
                         }
                     }
                 }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#f8f9fa' },
+                    ticks: { stepSize: 1 }
+                },
+                x: { grid: { display: false } }
             }
-        });
-    }
+        }
+    });
+}
 
-    function renderTypeChart(data) {
-        const ctx = document.getElementById('typeChart').getContext('2d');
-        const typeCounts = {};
-        
-        // Initialize all types with 0 count
-        Array.from(data.types).forEach(type => {
-            typeCounts[type] = 0;
-        });
+function renderTypeChart(data) {
+    const ctx = document.getElementById('typeChart').getContext('2d');
+    const typeCounts = {};
+    
+    Array.from(data.types).forEach(type => {
+        typeCounts[type] = 0;
+    });
 
-        // Calculate total counts for each type
-        Object.values(data.sectors).forEach(sector => {
-            Object.values(sector).forEach(status => {
-                Object.entries(status).forEach(([type, count]) => {
-                    typeCounts[type] += count;
-                });
+    Object.values(data.sectors).forEach(sector => {
+        Object.values(sector).forEach(status => {
+            Object.entries(status).forEach(([type, count]) => {
+                typeCounts[type] += count;
             });
         });
+    });
 
-        // Filter out types with 0 count
-        const filteredTypes = Object.entries(typeCounts)
-            .filter(([_, count]) => count > 0)
-            .sort((a, b) => b[1] - a[1]);
+    const filteredTypes = Object.entries(typeCounts)
+        .filter(([_, count]) => count > 0)
+        .sort((a, b) => b[1] - a[1]);
 
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: filteredTypes.map(([type]) => type),
-                datasets: [{
-                    data: filteredTypes.map(([_, count]) => count),
-                    backgroundColor: [
-                        '#4361ee',
-                        '#3f37c9',
-                        '#4cc9f0',
-                        '#4895ef',
-                        '#3a0ca3',
-                        '#7209b7',
-                        '#f72585'
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.raw || 0;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = Math.round((value / total) * 100);
-                                return `${label}: ${value} (${percentage}%)`;
-                            }
-                        }
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: filteredTypes.map(([type]) => type),
+            datasets: [{
+                data: filteredTypes.map(([_, count]) => count),
+                backgroundColor: [
+                    '#4361ee', '#3f37c9', '#4cc9f0', '#4895ef', 
+                    '#3a0ca3', '#7209b7', '#f72585'
+                ],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: { size: 12 }
                     }
                 },
-                cutout: '60%'
-            }
-        });
-    }
-
-    function populateTable(data) {
-        const tbody = document.querySelector('#dataTable tbody');
-        const typeHeaders = document.querySelector('#typeHeaders');
-        tbody.innerHTML = '';
-        typeHeaders.innerHTML = '';
-
-        // Generate headers for ticket types
-        Array.from(data.types)
-            .sort()
-            .forEach(type => {
-                const th = document.createElement('th');
-                th.className = 'ticket-type-header';
-                th.textContent = type;
-                typeHeaders.appendChild(th);
-            });
-
-        // Generate table rows, filtering out empty sectors
-        Object.entries(data.sectors)
-            .filter(([sector]) => sector.trim() !== '')
-            .sort(([sectorA], [sectorB]) => sectorA.localeCompare(sectorB))
-            .forEach(([sector, statusData]) => {
-                Object.entries(statusData)
-                    .sort(([statusA], [statusB]) => statusA.localeCompare(statusB))
-                    .forEach(([status, typeData]) => {
-                        const row = document.createElement('tr');
-                        
-                        // Sector and Status columns
-                        row.innerHTML = `
-                            <td>${sector}</td>
-                            <td><span class="status-badge bg-${status.toLowerCase()}">${status}</span></td>
-                        `;
-
-                        // Ticket type columns
-                        Array.from(data.types)
-                            .sort()
-                            .forEach(type => {
-                                const count = typeData[type] || 0;
-                                if (count > 0) {
-                                    row.innerHTML += `<td class="clickable-count" 
-                                        data-sector="${sector}" 
-                                        data-status="${status}" 
-                                        data-type="${type}">${count}</td>`;
-                                } else {
-                                    row.innerHTML += `<td>0</td>`;
-                                }
-                            });
-
-                        tbody.appendChild(row);
-                    });
-            });
-
-        // Add click event listeners to all clickable counts
-        document.querySelectorAll('.clickable-count').forEach(cell => {
-            cell.addEventListener('click', function() {
-                showTicketDetails(
-                    this.getAttribute('data-sector'),
-                    this.getAttribute('data-status'),
-                    this.getAttribute('data-type')
-                );
-            });
-        });
-
-        // Show message if no valid data
-        if (tbody.innerHTML === '') {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="${Array.from(data.types).length + 2}" class="text-center text-muted py-4">
-                        No valid data available (empty sectors have been filtered out)
-                    </td>
-                </tr>
-            `;
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            cutout: '60%'
         }
-    }
+    });
+}
 
-    function showTicketDetails(sector, status, type) {
-        // Filter tickets based on the clicked criteria
-        const filteredTickets = allTicketData.filter(ticket => {
-            return ticket.sector === sector && 
-                   ticket.status === status && 
-                   ticket.type === type;
+function populateTable(data) {
+    const tbody = document.querySelector('#dataTable tbody');
+    const typeHeaders = document.querySelector('#typeHeaders');
+    tbody.innerHTML = '';
+    typeHeaders.innerHTML = '';
+
+    Array.from(data.types)
+        .sort()
+        .forEach(type => {
+            const th = document.createElement('th');
+            th.className = 'ticket-type-header';
+            th.textContent = type;
+            typeHeaders.appendChild(th);
         });
 
-        // Update modal title and info
-        document.getElementById('modalSector').textContent = sector;
-        document.getElementById('modalStatus').textContent = status;
-        document.getElementById('modalType').textContent = type;
-        
-        // Populate ticket list
-        const ticketList = document.getElementById('ticketList');
-        ticketList.innerHTML = '';
-        
-        if (filteredTickets.length === 0) {
-            ticketList.innerHTML = '<div class="text-center text-muted py-4">No tickets found</div>';
-        } else {
-            filteredTickets.forEach(ticket => {
-                const ticketItem = document.createElement('div');
-                ticketItem.className = 'ticket-item';
-                ticketItem.innerHTML = `
-                    <div class="d-flex justify-content-between">
-                        <strong>${ticket.title || 'No Title'}</strong>
-                        <span class="badge bg-secondary">${ticket.id}</span>
-                    </div>
-                    <div class="text-muted small mb-2">Created: ${ticket.createdDate || 'Unknown'}</div>
-                    <div>${ticket.description || 'No description available'}</div>
-                    <div class="mt-2">
-                        <span class="badge bg-info">Priority: ${ticket.priority || 'Unknown'}</span>
-                        <span class="badge bg-light text-dark ms-2">Flag: ${ticket.flag || 'None'}</span>
-                    </div>
-                `;
-                ticketList.appendChild(ticketItem);
-            });
-        }
-        
-        // Show the modal
-        const modal = new bootstrap.Modal(document.getElementById('ticketModal'));
-        modal.show();
-    }
+    Object.entries(data.sectors)
+        .filter(([sector]) => sector.trim() !== '')
+        .sort(([sectorA], [sectorB]) => sectorA.localeCompare(sectorB))
+        .forEach(([sector, statusData]) => {
+            Object.entries(statusData)
+                .sort(([statusA], [statusB]) => statusA.localeCompare(statusB))
+                .forEach(([status, typeData]) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${sector}</td>
+                        <td><span class="status-badge bg-${status.toLowerCase()}">${status}</span></td>
+                    `;
 
-    function showError(message) {
-        const alert = document.createElement('div');
-        alert.className = 'alert alert-danger alert-dismissible fade show';
-        alert.role = 'alert';
-        alert.innerHTML = `
-            <i class="fas fa-exclamation-circle me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    Array.from(data.types)
+                        .sort()
+                        .forEach(type => {
+                            const count = typeData[type] || 0;
+                            if (count > 0) {
+                                row.innerHTML += `<td class="clickable-count" 
+                                    data-sector="${sector}" 
+                                    data-status="${status}" 
+                                    data-type="${type}">${count}</td>`;
+                            } else {
+                                row.innerHTML += `<td>0</td>`;
+                            }
+                        });
+
+                    tbody.appendChild(row);
+                });
+        });
+
+    document.querySelectorAll('.clickable-count').forEach(cell => {
+        cell.addEventListener('click', function() {
+            showTicketDetails(
+                this.getAttribute('data-sector'),
+                this.getAttribute('data-status'),
+                this.getAttribute('data-type')
+            );
+        });
+    });
+
+    if (tbody.innerHTML === '') {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="${Array.from(data.types).length + 2}" class="text-center text-muted py-4">
+                    No valid data available (empty sectors have been filtered out)
+                </td>
+            </tr>
         `;
-        document.querySelector('.content').prepend(alert);
     }
+}
 
-    document.addEventListener('DOMContentLoaded', fetchData);
+function showTicketDetails(sector, status, type) {
+    const filteredTickets = allTicketData.filter(ticket => {
+        return ticket.sector === sector && 
+               ticket.status === status && 
+               ticket.type === type;
+    });
+
+    document.getElementById('modalSector').textContent = sector;
+    document.getElementById('modalStatus').textContent = status;
+    document.getElementById('modalType').textContent = type;
+    
+    const ticketList = document.getElementById('ticketList');
+    ticketList.innerHTML = '';
+    
+    if (filteredTickets.length === 0) {
+        ticketList.innerHTML = '<div class="text-center text-muted py-4">No tickets found</div>';
+    } else {
+        filteredTickets.forEach(ticket => {
+            const ticketItem = document.createElement('div');
+            ticketItem.className = 'ticket-item';
+            ticketItem.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <strong>${ticket.ReportDate || 'No Report Date'}</strong>
+                    <span class="badge bg-secondary">${ticket.id}</span>
+                </div>
+                <div class="text-muted small mb-2">Created: ${ticket.HdCreate || 'Unknown'}</div>
+                <div>${ticket.BookingDate || 'No Booking Date'}</div>
+                <div class="mt-2">
+                    <span class="badge bg-info">Teknisi Assign: ${ticket.teknisiAssign || 'Unknown'}</span>
+                    <span class="badge bg-success">Teknisi Close: ${ticket.teknisiClose || 'Tiket Masih Sisa'}</span>
+                    <span class="badge bg-light text-dark ms-2">Flag: ${ticket.flag || 'None'}</span>
+                </div>
+            `;
+            ticketList.appendChild(ticketItem);
+        });
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('ticketModal'));
+    modal.show();
+}
+
+function showError(message) {
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger alert-dismissible fade show';
+    alert.role = 'alert';
+    alert.innerHTML = `
+        <i class="fas fa-exclamation-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.content').prepend(alert);
+}
+
+document.addEventListener('DOMContentLoaded', fetchData);
 </script>
 
 </body>

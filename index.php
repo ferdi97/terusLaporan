@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="styles.css">
-    <!-- <script>
+    <script>
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
         });
@@ -32,7 +32,7 @@
                 e.preventDefault();
             }
         });
-    </script> -->
+    </script>
 </head>
 
 <body>
