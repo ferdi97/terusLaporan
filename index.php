@@ -15,7 +15,7 @@
         });
 
         document.addEventListener('keydown', function(e) {
-            // Menonaktifkan F12
+            // Menonaktifkan F12  
             if (e.key === 'F12') {
                 e.preventDefault();
             }
