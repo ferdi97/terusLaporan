@@ -19,7 +19,7 @@
             if (e.key === 'F12') {
                 e.preventDefault();
             }
-            // Menonaktifkan Ctrl+Shift+I (Inspect Element)
+            // Menonaktifkan Ctrl+Shift+I ment)
             if (e.ctrlKey && e.shiftKey && e.key === 'I') {
                 e.preventDefault();
             }
