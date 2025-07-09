@@ -1,9 +1,45 @@
 <?php
+// Set timezone ke WITA
+date_default_timezone_set('Asia/Makassar');
+
 // Fungsi untuk memeriksa apakah tanggal sama dengan hari ini
 function isToday($date) {
     $today = date('Y-m-d');
     $inputDate = date('Y-m-d', strtotime($date));
     return $today == $inputDate;
+}
+
+// Fungsi untuk format waktu
+function formatWaktu($waktu) {
+    return date('H:i', strtotime($waktu));
+}
+
+// Proses delete jika ada parameter delete_id
+if (isset($_GET['delete_id'])) {
+    $delete_id = $_GET['delete_id'];
+    $lines = file('data_teknisi.json', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $new_lines = [];
+    
+    foreach ($lines as $line) {
+        $data = json_decode($line, true);
+        // Hapus baris yang sesuai dengan delete_id dan foto yang terkait
+        if ($data['foto'] != $delete_id) {
+            $new_lines[] = $line;
+        } else {
+            // Hapus file foto
+            $file_path = 'uploads/' . $delete_id;
+            if (file_exists($file_path)) {
+                unlink($file_path);
+            }
+        }
+    }
+    
+    // Simpan kembali data ke file
+    file_put_contents('data_teknisi.json', implode("\n", $new_lines));
+    
+    // Redirect untuk menghindari resubmit
+    header("Location: data_hariini.php");
+    exit();
 }
 
 // Baca data dari file JSON
@@ -30,11 +66,6 @@ if (file_exists('data_teknisi.json')) {
     // Urutkan STO berdasarkan abjad
     ksort($sto_groups);
 }
-
-// Fungsi untuk format waktu
-function formatWaktu($waktu) {
-    return date('H:i', strtotime($waktu));
-}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -43,11 +74,13 @@ function formatWaktu($waktu) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Teknisi Hari Ini</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3f37c9;
             --accent-color: #4895ef;
+            --danger-color: #f72585;
             --light-color: #f8f9fa;
             --dark-color: #212529;
             --gray-color: #6c757d;
@@ -166,6 +199,7 @@ function formatWaktu($waktu) {
             border-radius: 8px;
             padding: 1rem;
             transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
         }
         
         .teknisi-card:hover {
@@ -217,6 +251,126 @@ function formatWaktu($waktu) {
             margin-top: 2rem;
         }
         
+        /* Modal untuk zoom foto */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .modal-image {
+            width: 100%;
+            height: auto;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .photo-container {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .photo-container:hover {
+            transform: scale(1.02);
+        }
+        
+        /* Tombol delete */
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .teknisi-card:hover .delete-btn {
+            opacity: 1;
+        }
+        
+        .delete-btn:hover {
+            background-color: #d11465;
+        }
+        
+        /* Confirmation modal */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .confirm-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .confirm-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .confirm-btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .confirm-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .confirm-cancel {
+            background-color: var(--gray-color);
+            color: white;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .teknisi-grid {
@@ -227,6 +381,10 @@ function formatWaktu($waktu) {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.5rem;
+            }
+            
+            .delete-btn {
+                opacity: 1; /* Selalu tampilkan tombol delete di mobile */
             }
         }
         
@@ -273,7 +431,13 @@ function formatWaktu($waktu) {
                     <div class="teknisi-grid">
                         <?php foreach ($teknisi_list as $teknisi): ?>
                             <div class="teknisi-card">
-                                <img src="uploads/<?php echo htmlspecialchars($teknisi['foto']); ?>" alt="Foto Teknisi" class="teknisi-photo">
+                                <button class="delete-btn" onclick="showConfirmDelete('<?php echo htmlspecialchars($teknisi['foto']); ?>')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                
+                                <div class="photo-container" onclick="openModal('uploads/<?php echo htmlspecialchars($teknisi['foto']); ?>')">
+                                    <img src="uploads/<?php echo htmlspecialchars($teknisi['foto']); ?>" alt="Foto Teknisi" class="teknisi-photo">
+                                </div>
                                 
                                 <div class="teknisi-info">
                                     <div class="info-label">NIK</div>
@@ -304,7 +468,90 @@ function formatWaktu($waktu) {
     </div>
     
     <div class="footer">
-        Aplikasi Teknisi Lapangan &copy; <?php echo date('Y'); ?>
+        Aplikasi Teknisi Lapangan &copy; By BAGAS ANGGITA SIWI <?php echo date('Y'); ?>
     </div>
+
+    <!-- Modal untuk zoom foto -->
+    <div id="imageModal" class="modal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" class="modal-image">
+        </div>
+    </div>
+    
+    <!-- Modal konfirmasi delete -->
+    <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-content">
+            <h3>Konfirmasi Hapus Data</h3>
+            <p>Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="confirm-actions">
+                <button class="confirm-btn confirm-cancel" onclick="hideConfirmDelete()">Batal</button>
+                <button class="confirm-btn confirm-delete" id="confirmDeleteBtn">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk zoom foto
+        function openModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            
+            modal.style.display = 'flex';
+            modalImg.src = imageSrc;
+            
+            modal.onclick = function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+            
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        }
+        
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        // Fungsi untuk delete data
+        let currentDeleteId = null;
+        
+        function showConfirmDelete(id) {
+            currentDeleteId = id;
+            document.getElementById('confirmModal').style.display = 'flex';
+            
+            // Stop event bubbling
+            event.stopPropagation();
+        }
+        
+        function hideConfirmDelete() {
+            document.getElementById('confirmModal').style.display = 'none';
+            currentDeleteId = null;
+        }
+        
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            if (currentDeleteId) {
+                window.location.href = 'data_hariini.php?delete_id=' + currentDeleteId;
+            }
+        });
+        
+        // Close confirm modal when clicking outside
+        document.getElementById('confirmModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideConfirmDelete();
+            }
+        });
+        
+        // Close with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('confirmModal').style.display === 'flex') {
+                hideConfirmDelete();
+            }
+        });
+    </script>
 </body>
 </html>
