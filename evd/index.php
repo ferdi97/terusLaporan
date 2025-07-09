@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Asia/Makassar'); // Set zona waktu ke WITA (Asia/Makassar)
 // Daftar STO
 $sto_list = array(
     "SMR1", "SMR2", "LMP", "TMD", "LOB", "SEM", 
@@ -37,7 +38,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     'latitude' => $latitude,
                     'longitude' => $longitude,
                     'foto' => $new_filename,
-                    'waktu' => date('Y-m-d H:i:s')
+                    'waktu' => date('Y-m-d H:i:s'),
+                    'timezone' => 'WITA'
                 );
                 
                 // Simpan ke file JSON (bisa diganti dengan database)
@@ -294,6 +296,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-top: 1px solid #eee;
         }
         
+        /* Camera select dropdown */
+        #camera-select {
+            margin-top: 0.5rem;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+        
+        #camera-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+        
         /* Responsive adjustments */
         @media (min-width: 768px) {
             .header h1 {
@@ -417,6 +437,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <span>Swafoto</span>
                 </div>
                 <div class="form-body">
+                    <div class="form-group">
+                        <label for="camera-select">Pilih Kamera</label>
+                        <select class="form-control" id="camera-select">
+                            <option value="environment">Kamera Belakang</option>
+                            <option value="user">Kamera Depan</option>
+                        </select>
+                    </div>
+                    
                     <div class="camera-section">
                         <div class="camera-container">
                             <video id="camera-preview" autoplay playsinline></video>
@@ -458,6 +486,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         let defaultLng = 106.8456;
         let userLocated = false;
         let stream = null;
+        let currentFacingMode = 'environment';
         
         document.addEventListener('DOMContentLoaded', function() {
             initMap();
@@ -545,6 +574,72 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
         
+        // Function to start camera with selected facing mode
+        function startCamera(facingMode) {
+            stopCamera(); // Stop any existing stream
+            
+            const video = document.getElementById('camera-preview');
+            
+            navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    facingMode: facingMode,
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                } 
+            })
+            .then(function(mediaStream) {
+                stream = mediaStream;
+                video.srcObject = mediaStream;
+                currentFacingMode = facingMode;
+                
+                video.onloadedmetadata = function() {
+                    adjustVideoOrientation();
+                };
+            })
+            .catch(function(error) {
+                console.error("Error accessing camera: ", error);
+                handleCameraError();
+            });
+        }
+        
+        // Function to stop camera
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        }
+        
+        // Function to handle camera error
+        function handleCameraError() {
+            const video = document.getElementById('camera-preview');
+            const fileInput = document.getElementById('file-input');
+            const captureBtn = document.getElementById('capture-btn');
+            
+            video.style.display = 'none';
+            fileInput.style.display = 'block';
+            captureBtn.style.display = 'none';
+            
+            // Buat elemen untuk meminta akses kamera
+            const cameraError = document.createElement('div');
+            cameraError.innerHTML = `
+                <p style="text-align: center; color: #666; margin-bottom: 1rem;">
+                    Kamera tidak dapat diakses. Silakan gunakan tombol di bawah untuk upload foto.
+                </p>
+            `;
+            video.parentNode.insertBefore(cameraError, video.nextSibling);
+        }
+        
+        // Function to adjust video orientation
+        function adjustVideoOrientation() {
+            const video = document.getElementById('camera-preview');
+            const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+            if (isPortrait) {
+                video.style.transform = 'rotate(0deg)';
+            } else {
+                video.style.transform = 'rotate(90deg)';
+            }
+        }
+        
         function initCamera() {
             const video = document.getElementById('camera-preview');
             const photoResult = document.getElementById('photo-result');
@@ -552,52 +647,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             const retakeBtn = document.getElementById('retake-btn');
             const fileInput = document.getElementById('file-input');
             const flashEffect = document.getElementById('flashEffect');
+            const cameraSelect = document.getElementById('camera-select');
             
-            // Coba akses kamera
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    } 
-                })
-                .then(function(mediaStream) {
-                    stream = mediaStream;
-                    video.srcObject = mediaStream;
-                    
-                    // Atur orientasi video berdasarkan orientasi perangkat
-                    video.onloadedmetadata = function() {
-                        const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-                        if (isPortrait) {
-                            video.style.transform = 'rotate(0deg)';
-                        } else {
-                            video.style.transform = 'rotate(90deg)';
-                        }
-                    };
-                })
-                .catch(function(error) {
-                    console.error("Error accessing camera: ", error);
-                    // Jika tidak bisa akses kamera, tampilkan input file
-                    video.style.display = 'none';
-                    fileInput.style.display = 'block';
-                    captureBtn.style.display = 'none';
-                    
-                    // Buat elemen untuk meminta akses kamera
-                    const cameraError = document.createElement('div');
-                    cameraError.innerHTML = `
-                        <p style="text-align: center; color: #666; margin-bottom: 1rem;">
-                            Kamera tidak dapat diakses. Silakan gunakan tombol di bawah untuk upload foto.
-                        </p>
-                    `;
-                    video.parentNode.insertBefore(cameraError, video.nextSibling);
-                });
-            } else {
-                // Browser tidak mendukung getUserMedia, tampilkan input file
-                video.style.display = 'none';
-                fileInput.style.display = 'block';
-                captureBtn.style.display = 'none';
-            }
+            // Start with default camera (back)
+            startCamera(currentFacingMode);
+            
+            // Handle camera selection change
+            cameraSelect.addEventListener('change', function() {
+                const facingMode = this.value;
+                startCamera(facingMode);
+            });
             
             // Tangkap foto
             captureBtn.addEventListener('click', function() {
@@ -649,12 +708,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Handle perubahan orientasi perangkat
             window.addEventListener('orientationchange', function() {
                 if (video.srcObject) {
-                    const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-                    if (isPortrait) {
-                        video.style.transform = 'rotate(0deg)';
-                    } else {
-                        video.style.transform = 'rotate(90deg)';
-                    }
+                    adjustVideoOrientation();
                 }
             });
         }
