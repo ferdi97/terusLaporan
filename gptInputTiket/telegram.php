@@ -1,0 +1,1 @@
+<?php // Fungsi kirim Telegram ?>
