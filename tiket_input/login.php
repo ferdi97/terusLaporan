@@ -1,7 +1,7 @@
 <?php
-session_start();
-require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/functions.php';
+
+start_secure_session();
 
 if (is_logged_in()) {
     header('Location: dashboard.php');
@@ -26,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['temp_user'] = $user;
             
             // Kirim OTP (simulasi)
-            // Di produksi, integrasikan dengan Google Auth atau layanan SMS
             echo "<script>alert('OTP Anda: $otp');</script>";
             
             header('Location: verify_otp.php');
@@ -40,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Generate CAPTCHA
 $captcha_code = generate_captcha();
 $_SESSION['captcha'] = $captcha_code;
+$captcha_image = generate_captcha_image($captcha_code);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -48,6 +48,7 @@ $_SESSION['captcha'] = $captcha_code;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistem Tiket</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="login-container animated fadeIn">
@@ -75,7 +76,7 @@ $_SESSION['captcha'] = $captcha_code;
                 <div class="form-group captcha-group">
                     <label for="captcha">CAPTCHA</label>
                     <div class="captcha-container">
-                        <div class="captcha-image"><?= $captcha_code ?></div>
+                        <img src="<?= $captcha_image ?>" alt="CAPTCHA" class="captcha-image">
                         <button type="button" class="btn-refresh" onclick="refreshCaptcha()">
                             <i class="fas fa-sync-alt"></i>
                         </button>
@@ -91,10 +92,15 @@ $_SESSION['captcha'] = $captcha_code;
     <script src="assets/js/script.js"></script>
     <script>
         function refreshCaptcha() {
-            fetch('includes/captcha.php')
+            fetch('captcha.php')
                 .then(response => response.text())
                 .then(data => {
-                    document.querySelector('.captcha-image').textContent = data;
+                    // Perbarui CAPTCHA di session
+                    fetch('update_captcha.php?captcha=' + data)
+                        .then(() => {
+                            // Refresh halaman untuk mendapatkan gambar CAPTCHA baru
+                            location.reload();
+                        });
                 });
         }
     </script>
