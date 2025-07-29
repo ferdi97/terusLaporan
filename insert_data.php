@@ -47,7 +47,7 @@ try {
                 'share_location' => $data['share_location'],
                 'tanggal_keluhan' => $tanggal_keluhan // Menggunakan format baru
             ]
-        ]);
+        ]); 
     } else {
         throw new Exception("Gagal menyimpan data");
     }
