@@ -4,7 +4,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 
 // Daftar route yang diizinkan
 $routes = [
-    'home'      => 'home.php',
+    'home'      => 'home2.php',
     'error' => '404.php',
     'error'   => '404.php',
 ];

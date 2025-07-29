@@ -2,10 +2,15 @@
 header('Content-Type: application/json');
 
 // Database configuration
+// $servername = "localhost";
+// $username_db = "root";
+// $password_db = "";
+// $dbname = "db_keluhan";
+
 $servername = "localhost";
-$username_db = "root";
-$password_db = "";
-$dbname = "db_keluhan";
+$username_db = "u545755515_algoritma";
+$password_db = "Algoritma97";
+$dbname = "u545755515_db_keluhan";
 
 // Create connection
 $conn = new mysqli($servername, $username_db, $password_db, $dbname);
