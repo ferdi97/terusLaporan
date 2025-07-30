@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+date_default_timezone_set('Asia/Makassar');
 
 // Database configuration
 // $servername = "localhost";
@@ -57,14 +58,14 @@ $sql = "INSERT INTO keluhan (
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param(
-    "ssssssss", 
-    $kd_tiket, 
-    $nomor_internet, 
-    $nama_pelapor, 
-    $no_hp_pelapor, 
-    $alamat_lengkap, 
-    $keluhan, 
-    $share_location, 
+    "ssssssss",
+    $kd_tiket,
+    $nomor_internet,
+    $nama_pelapor,
+    $no_hp_pelapor,
+    $alamat_lengkap,
+    $keluhan,
+    $share_location,
     $tanggal_keluhan
 );
 
@@ -81,7 +82,7 @@ if ($stmt->execute()) {
             'keluhan' => $keluhan,
             'share_location' => $share_location,
             'tanggal_keluhan' => $tanggal_keluhan
-        ]   
+        ]
     ]);
 } else {
     echo json_encode([
@@ -93,4 +94,3 @@ if ($stmt->execute()) {
 // Close connections
 $stmt->close();
 $conn->close();
-?>
