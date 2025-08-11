@@ -1,0 +1,45 @@
+/* Custom styles */
+.photo-upload-container {
+    border: 2px dashed #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.photo-upload-container:hover {
+    border-color: #4299e1;
+}
+
+.camera-btn {
+    background-color: #ebf8ff;
+    color: #3182ce;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.camera-btn:hover {
+    background-color: #bee3f8;
+}
+
+#cameraModal {
+    transition: opacity 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .photo-upload-container {
+        padding: 0.75rem;
+    }
+    
+    .camera-btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+    }
+}
