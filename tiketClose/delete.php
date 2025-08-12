@@ -7,7 +7,7 @@ if (!isset($_GET['id'])) {
 }
 
 $id = $_GET['id'];
-$ticket = getTicketById($id);
+$ticket = getTicketById($pdo, $id);
 
 if (!$ticket) {
     header("Location: index.php");
@@ -15,12 +15,7 @@ if (!$ticket) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Delete associated photos
-    foreach ($ticket['photos'] as $photo) {
-        @unlink($photo);
-    }
-    
-    if (deleteTicket($id)) {
+    if (deleteTicket($pdo, $id)) {
         header("Location: index.php");
         exit;
     }

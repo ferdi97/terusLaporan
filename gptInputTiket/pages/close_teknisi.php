@@ -1,1 +1,0 @@
-<?php // CLOSE form + upload foto + kirim Telegram ?>

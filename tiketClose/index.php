@@ -1,7 +1,7 @@
 <?php
 require_once 'includes/functions.php';
 
-$tickets = getAllTickets();
+$tickets = getAllTickets($pdo);
 ?>
 <!DOCTYPE html>
 <html lang="en">

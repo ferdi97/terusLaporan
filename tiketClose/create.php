@@ -2,34 +2,28 @@
 require_once 'includes/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Handle form submission
     $data = [
         'nik' => $_POST['nik'],
         'ticket' => $_POST['ticket'],
         'no_inet' => $_POST['no_inet'],
         'rfo' => $_POST['rfo'],
-        'photos' => []
+        'photo1' => null,
+        'photo2' => null,
+        'photo3' => null,
+        'photo4' => null
     ];
     
-    // Handle photo uploads
+    // Upload foto
     for ($i = 1; $i <= 4; $i++) {
-        if (isset($_FILES['photo'.$i]) {
-            $photo = $_FILES['photo'.$i];
-            if ($photo['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = 'assets/uploads/';
-                if (!file_exists($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-                $filename = uniqid() . '_' . basename($photo['name']);
-                $targetPath = $uploadDir . $filename;
-                if (move_uploaded_file($photo['tmp_name'], $targetPath)) {
-                    $data['photos'][] = $targetPath;
-                }
+        if (isset($_FILES['photo'.$i])) {
+            $photoPath = uploadPhoto($_FILES['photo'.$i], 'photo'.$i);
+            if ($photoPath) {
+                $data['photo'.$i] = $photoPath;
             }
         }
     }
     
-    $id = createTicket($data);
+    $id = createTicket($pdo, $data);
     header("Location: view.php?id=$id");
     exit;
 }

@@ -1,14 +1,13 @@
 <?php
-function getDB() {
-    $file = __DIR__ . '/../data/tickets.json';
-    if (!file_exists($file)) {
-        file_put_contents($file, '[]');
-    }
-    return json_decode(file_get_contents($file), true);
-}
+$host = 'localhost';
+$dbname = 'db_keluhan';
+$username = 'root';
+$password = '';
 
-function saveDB($data) {
-    $file = __DIR__ . '/../data/tickets.json';
-    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Koneksi database gagal: " . $e->getMessage());
 }
 ?>

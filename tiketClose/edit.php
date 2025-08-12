@@ -7,7 +7,7 @@ if (!isset($_GET['id'])) {
 }
 
 $id = $_GET['id'];
-$ticket = getTicketById($id);
+$ticket = getTicketById($pdo, $id);
 
 if (!$ticket) {
     header("Location: index.php");
@@ -20,30 +20,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'ticket' => $_POST['ticket'],
         'no_inet' => $_POST['no_inet'],
         'rfo' => $_POST['rfo'],
-        'photos' => $ticket['photos'] // Keep existing photos
+        'photo1' => $ticket['photo1'],
+        'photo2' => $ticket['photo2'],
+        'photo3' => $ticket['photo3'],
+        'photo4' => $ticket['photo4']
     ];
     
     // Handle photo updates
     for ($i = 1; $i <= 4; $i++) {
         if (isset($_FILES['photo'.$i]) && $_FILES['photo'.$i]['error'] === UPLOAD_ERR_OK) {
             // Remove old photo if exists
-            if (isset($ticket['photos'][$i-1])) {
-                @unlink($ticket['photos'][$i-1]);
+            if (!empty($ticket['photo'.$i])) {
+                @unlink($ticket['photo'.$i]);
             }
             
             // Upload new photo
-            $photo = $_FILES['photo'.$i];
-            $uploadDir = 'assets/uploads/';
-            $filename = uniqid() . '_' . basename($photo['name']);
-            $targetPath = $uploadDir . $filename;
-            
-            if (move_uploaded_file($photo['tmp_name'], $targetPath)) {
-                $data['photos'][$i-1] = $targetPath;
+            $photoPath = uploadPhoto($_FILES['photo'.$i], 'photo'.$i);
+            if ($photoPath) {
+                $data['photo'.$i] = $photoPath;
             }
         }
     }
     
-    if (updateTicket($id, $data)) {
+    if (updateTicket($pdo, $id, $data)) {
         header("Location: view.php?id=$id");
         exit;
     }
@@ -101,9 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Swafoto</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <?php for ($i = 1; $i <= 4; $i++): 
-                            $photoExists = isset($ticket['photos'][$i-1]);
-                        ?>
+                        <?php for ($i = 1; $i <= 4; $i++): ?>
                         <div class="photo-upload-container">
                             <label class="block text-sm font-medium text-gray-700">Swafoto <?= $i ?></label>
                             <div class="mt-1 flex items-center space-x-4">
@@ -115,9 +112,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </button>
                             </div>
                             <input type="file" id="photo<?= $i ?>" name="photo<?= $i ?>" accept="image/*" capture="environment" class="hidden">
-                            <div class="photo-preview mt-2 <?= $photoExists ? '' : 'hidden' ?>">
-                                <?php if ($photoExists): ?>
-                                <img id="preview<?= $i ?>" src="<?= htmlspecialchars($ticket['photos'][$i-1]) ?>" alt="Preview" class="h-32 object-cover rounded-md">
+                            <div class="photo-preview mt-2 <?= !empty($ticket['photo'.$i]) ? '' : 'hidden' ?>">
+                                <?php if (!empty($ticket['photo'.$i])): ?>
+                                <img id="preview<?= $i ?>" src="<?= htmlspecialchars($ticket['photo'.$i]) ?>" alt="Preview" class="h-32 object-cover rounded-md">
                                 <?php else: ?>
                                 <img id="preview<?= $i ?>" src="#" alt="Preview" class="h-32 object-cover rounded-md hidden">
                                 <?php endif; ?>

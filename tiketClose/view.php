@@ -7,7 +7,7 @@ if (!isset($_GET['id'])) {
 }
 
 $id = $_GET['id'];
-$ticket = getTicketById($id);
+$ticket = getTicketById($pdo, $id);
 
 if (!$ticket) {
     header("Location: index.php");
@@ -65,7 +65,7 @@ if (!$ticket) {
                         <p class="mt-1 text-lg font-semibold text-gray-900"><?= htmlspecialchars($ticket['created_at']) ?></p>
                     </div>
                     
-                    <?php if (isset($ticket['updated_at'])): ?>
+                    <?php if ($ticket['created_at'] != $ticket['updated_at']): ?>
                     <div>
                         <h3 class="text-sm font-medium text-gray-500">Diupdate Pada</h3>
                         <p class="mt-1 text-lg font-semibold text-gray-900"><?= htmlspecialchars($ticket['updated_at']) ?></p>
@@ -77,14 +77,16 @@ if (!$ticket) {
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Swafoto</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <?php foreach ($ticket['photos'] as $index => $photo): ?>
-                        <div class="border rounded-lg overflow-hidden">
-                            <img src="<?= htmlspecialchars($photo) ?>" alt="Swafoto <?= $index + 1 ?>" class="w-full h-48 object-cover">
-                            <div class="p-2 bg-gray-50 text-center">
-                                <span class="text-sm text-gray-600">Swafoto <?= $index + 1 ?></span>
+                        <?php for ($i = 1; $i <= 4; $i++): ?>
+                            <?php if (!empty($ticket['photo'.$i])): ?>
+                            <div class="border rounded-lg overflow-hidden">
+                                <img src="<?= htmlspecialchars($ticket['photo'.$i]) ?>" alt="Swafoto <?= $i ?>" class="w-full h-48 object-cover">
+                                <div class="p-2 bg-gray-50 text-center">
+                                    <span class="text-sm text-gray-600">Swafoto <?= $i ?></span>
+                                </div>
                             </div>
-                        </div>
-                        <?php endforeach; ?>
+                            <?php endif; ?>
+                        <?php endfor; ?>
                     </div>
                 </div>
                 

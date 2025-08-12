@@ -1,1 +1,0 @@
-Buka index.php di browser lokal/hosting. Data simpan di folder /data, Telegram di telegram.php
