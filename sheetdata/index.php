@@ -29,6 +29,9 @@ $statusCol = array_search('STATUS', $headers);
 $priorityCol = array_search('PRIORITY', $headers);
 $typeCol = array_search('TICKET_TYPE', $headers);
 
+// Find the internet number column
+$inetCol = array_search('NOMOR INET', $headers);
+
 foreach ($rows as $row) {
     // Prepare filter options
     foreach ($headers as $index => $header) {
@@ -75,7 +78,8 @@ $jsonData = json_encode([
     'columnMap' => [
         'status' => $statusCol,
         'priority' => $priorityCol,
-        'type' => $typeCol
+        'type' => $typeCol,
+        'inet' => $inetCol
     ]
 ]);
 ?>
@@ -237,6 +241,90 @@ $jsonData = json_encode([
             margin-left: 5px;
         }
         
+        .inet-checker {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .inet-results {
+            margin-top: 20px;
+        }
+        
+        .ticket-item {
+            background-color: #fff;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .ticket-badge {
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+        
+        .ticket-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .detail-item {
+            margin-bottom: 8px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.85rem;
+        }
+        
+        .detail-value {
+            font-size: 0.9rem;
+        }
+        
+        .not-found-item {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-family: monospace;
+        }
+        
+        .copy-btn {
+            cursor: pointer;
+            padding: 5px 10px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .copy-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        .not-found-container {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
         @media (max-width: 768px) {
             .container-fluid {
                 padding: 10px;
@@ -252,6 +340,10 @@ $jsonData = json_encode([
             
             .stat-card {
                 margin-bottom: 10px;
+            }
+            
+            .ticket-details {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -345,6 +437,54 @@ $jsonData = json_encode([
                 </div>
             </div>
         </div>
+
+        <!-- Form Pengecekan Detail Tiket Berdasarkan Nomor Internet -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-search"></i> Cek Detail Tiket Berdasarkan Nomor Internet</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="inetNumbers" class="form-label">Masukkan nomor internet (satu nomor per baris):</label>
+                            <textarea class="form-control" id="inetNumbers" rows="8" placeholder="Contoh:&#10;1234567890&#10;0987654321&#10;..."></textarea>
+                            <div class="form-text">Anda dapat memasukkan hingga 1000 nomor internet sekaligus.</div>
+                        </div>
+                        <button id="checkInetNumbers" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Cari Tiket
+                        </button>
+                        <button id="clearInput" class="btn btn-outline-secondary ms-2">
+                            <i class="bi bi-trash"></i> Bersihkan
+                        </button>
+                    </div>
+                </div>
+
+                <div id="inetResults" class="mt-4 d-none">
+                    <h5>Hasil Pencarian</h5>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        <span id="summaryText"></span>
+                    </div>
+                    
+                    <div class="accordion" id="resultsAccordion">
+                        <!-- Hasil pencarian akan ditampilkan di sini -->
+                    </div>
+                    
+                    <div id="notFoundContainer" class="not-found-container mt-4 d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">Nomor Internet Tidak Ditemukan</h6>
+                            <button class="copy-btn" id="copyNotFound">
+                                <i class="bi bi-clipboard"></i> Salin
+                            </button>
+                        </div>
+                        <div id="notFoundList" class="not-found-list">
+                            <!-- Daftar nomor yang tidak ditemukan akan ditampilkan di sini -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -357,6 +497,7 @@ $jsonData = json_encode([
             let currentFilters = {};
             let currentSearch = '';
             let activeStatFilter = null;
+            let notFoundNumbers = [];
             
             // Initialize the table headers
             function initTableHeaders() {
@@ -610,6 +751,178 @@ $jsonData = json_encode([
             
             // Initialize the app
             init();
+            
+            // Function untuk mencari tiket berdasarkan nomor internet
+            $('#checkInetNumbers').on('click', function() {
+                const inetNumbersText = $('#inetNumbers').val().trim();
+                
+                if (!inetNumbersText) {
+                    alert('Masukkan nomor internet terlebih dahulu!');
+                    return;
+                }
+                
+                // Split input menjadi array dan bersihkan spasi
+                const inetNumbers = inetNumbersText.split('\n')
+                    .map(num => num.trim())
+                    .filter(num => num !== '');
+                
+                if (inetNumbers.length === 0) {
+                    alert('Tidak ada nomor internet yang valid!');
+                    return;
+                }
+                
+                // Cari tiket berdasarkan nomor internet
+                const inetColIndex = appData.columnMap.inet;
+                if (inetColIndex === undefined || inetColIndex === false) {
+                    alert('Kolom NOMOR_INET tidak ditemukan dalam data!');
+                    return;
+                }
+                
+                // Cari semua tiket yang sesuai
+                const foundTickets = {};
+                notFoundNumbers = [];
+                
+                inetNumbers.forEach(num => {
+                    const tickets = appData.rows.filter(row => 
+                        row[inetColIndex] && row[inetColIndex].toString().trim() === num
+                    );
+                    
+                    if (tickets.length > 0) {
+                        foundTickets[num] = tickets;
+                    } else {
+                        notFoundNumbers.push(num);
+                    }
+                });
+                
+                // Tampilkan hasil
+                displayInetResults(foundTickets, notFoundNumbers, inetNumbers.length);
+            });
+            
+            // Function untuk menampilkan hasil pencarian
+            function displayInetResults(foundTickets, notFoundNumbers, totalInput) {
+                const accordion = $('#resultsAccordion');
+                accordion.empty();
+                
+                // Hitung statistik
+                const foundCount = Object.keys(foundTickets).length;
+                const notFoundCount = notFoundNumbers.length;
+                const totalTickets = Object.values(foundTickets).reduce((total, tickets) => total + tickets.length, 0);
+                
+                // Update summary text
+                $('#summaryText').html(`
+                    Dari <strong>${totalInput}</strong> nomor yang diperiksa:
+                    <strong>${foundCount}</strong> nomor ditemukan dengan <strong>${totalTickets}</strong> tiket,
+                    <strong>${notFoundCount}</strong> nomor tidak ditemukan.
+                `);
+                
+                // Tampilkan tiket yang ditemukan
+                let accordionIndex = 0;
+                
+                for (const [inetNum, tickets] of Object.entries(foundTickets)) {
+                    const accordionId = `collapse${accordionIndex}`;
+                    const headingId = `heading${accordionIndex}`;
+                    
+                    // Buat header accordion
+                    accordion.append(`
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="${headingId}">
+                                <button class="accordion-button ${accordionIndex > 0 ? 'collapsed' : ''}" type="button" data-bs-toggle="collapse" data-bs-target="#${accordionId}" aria-expanded="${accordionIndex === 0 ? 'true' : 'false'}" aria-controls="${accordionId}">
+                                    <span class="badge bg-success me-2">${tickets.length} tiket</span> 
+                                    ${inetNum}
+                                </button>
+                            </h2>
+                            <div id="${accordionId}" class="accordion-collapse collapse ${accordionIndex === 0 ? 'show' : ''}" aria-labelledby="${headingId}" data-bs-parent="#resultsAccordion">
+                                <div class="accordion-body">
+                                    ${renderTickets(tickets)}
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                    
+                    accordionIndex++;
+                }
+                
+                // Tampilkan nomor yang tidak ditemukan
+                if (notFoundNumbers.length > 0) {
+                    $('#notFoundContainer').removeClass('d-none');
+                    $('#notFoundList').html(
+                        notFoundNumbers.map(num => 
+                            `<div class="not-found-item">${num}</div>`
+                        ).join('')
+                    );
+                } else {
+                    $('#notFoundContainer').addClass('d-none');
+                }
+                
+                // Tampilkan hasil
+                $('#inetResults').removeClass('d-none');
+                
+                // Scroll ke hasil
+                $('html, body').animate({
+                    scrollTop: $('#inetResults').offset().top - 20
+                }, 500);
+            }
+            
+            // Function untuk merender tiket
+            function renderTickets(tickets) {
+                let ticketsHtml = '';
+                
+                tickets.forEach((ticket, index) => {
+                    ticketsHtml += `
+                        <div class="ticket-item mb-3">
+                            <div class="ticket-header">
+                                <h6 class="mb-0">Tiket #${index + 1}</h6>
+                                <div>
+                                    ${ticket[appData.columnMap.status] ? `<span class="badge bg-secondary ticket-badge">${ticket[appData.columnMap.status]}</span>` : ''}
+                                    ${ticket[appData.columnMap.priority] ? `<span class="badge bg-warning ticket-badge">${ticket[appData.columnMap.priority]}</span>` : ''}
+                                    ${ticket[appData.columnMap.type] ? `<span class="badge bg-info ticket-badge">${ticket[appData.columnMap.type]}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="ticket-details">
+                                ${appData.headers.map((header, colIndex) => {
+                                    if (ticket[colIndex] && ticket[colIndex].toString().trim() !== '') {
+                                        return `
+                                            <div class="detail-item">
+                                                <div class="detail-label">${header}</div>
+                                                <div class="detail-value">${escapeHtml(ticket[colIndex])}</div>
+                                            </div>
+                                        `;
+                                    }
+                                    return '';
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                return ticketsHtml;
+            }
+            
+            // Clear input button
+            $('#clearInput').on('click', function() {
+                $('#inetNumbers').val('');
+                $('#inetResults').addClass('d-none');
+                $('#notFoundContainer').addClass('d-none');
+            });
+            
+            // Copy not found numbers to clipboard
+            $('#copyNotFound').on('click', function() {
+                if (notFoundNumbers.length > 0) {
+                    const textToCopy = notFoundNumbers.join('\n');
+                    navigator.clipboard.writeText(textToCopy).then(function() {
+                        // Ubah teks tombol sementara
+                        const originalText = $('#copyNotFound').html();
+                        $('#copyNotFound').html('<i class="bi bi-check"></i> Tersalin!');
+                        
+                        setTimeout(function() {
+                            $('#copyNotFound').html(originalText);
+                        }, 2000);
+                    }).catch(function(err) {
+                        console.error('Could not copy text: ', err);
+                        alert('Gagal menyalin teks ke clipboard');
+                    });
+                }
+            });
         });
     </script>
 </body>
