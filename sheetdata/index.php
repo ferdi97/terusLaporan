@@ -294,13 +294,34 @@ $jsonData = json_encode([
             font-size: 0.9rem;
         }
         
-        .not-found-item {
+        .inet-result-item {
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+        }
+        
+        .inet-found {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .inet-notfound {
             background-color: #f8d7da;
             color: #721c24;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 5px;
-            font-family: monospace;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-right: 10px;
+            min-width: 60px;
+            text-align: center;
         }
         
         .copy-btn {
@@ -311,15 +332,16 @@ $jsonData = json_encode([
             border: none;
             border-radius: 4px;
             font-size: 0.8rem;
+            margin-left: auto;
         }
         
         .copy-btn:hover {
             background-color: #5a6268;
         }
         
-        .not-found-container {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
+        .result-container {
+            background-color: white;
+            border: 1px solid #dee2e6;
             border-radius: 6px;
             padding: 15px;
             margin-top: 15px;
@@ -344,6 +366,10 @@ $jsonData = json_encode([
             
             .ticket-details {
                 grid-template-columns: 1fr;
+            }
+            
+            .inet-result-item {
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -467,20 +493,20 @@ $jsonData = json_encode([
                         <span id="summaryText"></span>
                     </div>
                     
-                    <div class="accordion" id="resultsAccordion">
-                        <!-- Hasil pencarian akan ditampilkan di sini -->
-                    </div>
-                    
-                    <div id="notFoundContainer" class="not-found-container mt-4 d-none">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0">Nomor Internet Tidak Ditemukan</h6>
-                            <button class="copy-btn" id="copyNotFound">
-                                <i class="bi bi-clipboard"></i> Salin
+                    <div class="result-container">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">Daftar Nomor Internet</h6>
+                            <button class="copy-btn" id="copyAllNumbers">
+                                <i class="bi bi-clipboard"></i> Salin Semua
                             </button>
                         </div>
-                        <div id="notFoundList" class="not-found-list">
-                            <!-- Daftar nomor yang tidak ditemukan akan ditampilkan di sini -->
+                        <div id="allNumbersList" class="all-numbers-list">
+                            <!-- Semua nomor akan ditampilkan di sini -->
                         </div>
+                    </div>
+                    
+                    <div class="accordion mt-4" id="resultsAccordion">
+                        <!-- Detail tiket akan ditampilkan di sini -->
                     </div>
                 </div>
             </div>
@@ -497,6 +523,8 @@ $jsonData = json_encode([
             let currentFilters = {};
             let currentSearch = '';
             let activeStatFilter = null;
+            let allInetNumbers = [];
+            let foundNumbers = [];
             let notFoundNumbers = [];
             
             // Initialize the table headers
@@ -762,11 +790,11 @@ $jsonData = json_encode([
                 }
                 
                 // Split input menjadi array dan bersihkan spasi
-                const inetNumbers = inetNumbersText.split('\n')
+                allInetNumbers = inetNumbersText.split('\n')
                     .map(num => num.trim())
                     .filter(num => num !== '');
                 
-                if (inetNumbers.length === 0) {
+                if (allInetNumbers.length === 0) {
                     alert('Tidak ada nomor internet yang valid!');
                     return;
                 }
@@ -780,40 +808,45 @@ $jsonData = json_encode([
                 
                 // Cari semua tiket yang sesuai
                 const foundTickets = {};
+                foundNumbers = [];
                 notFoundNumbers = [];
                 
-                inetNumbers.forEach(num => {
+                allInetNumbers.forEach(num => {
                     const tickets = appData.rows.filter(row => 
                         row[inetColIndex] && row[inetColIndex].toString().trim() === num
                     );
                     
                     if (tickets.length > 0) {
                         foundTickets[num] = tickets;
+                        foundNumbers.push(num);
                     } else {
                         notFoundNumbers.push(num);
                     }
                 });
                 
                 // Tampilkan hasil
-                displayInetResults(foundTickets, notFoundNumbers, inetNumbers.length);
+                displayInetResults(foundTickets, allInetNumbers);
             });
             
             // Function untuk menampilkan hasil pencarian
-            function displayInetResults(foundTickets, notFoundNumbers, totalInput) {
+            function displayInetResults(foundTickets, allNumbers) {
                 const accordion = $('#resultsAccordion');
                 accordion.empty();
                 
                 // Hitung statistik
                 const foundCount = Object.keys(foundTickets).length;
-                const notFoundCount = notFoundNumbers.length;
+                const notFoundCount = allNumbers.length - foundCount;
                 const totalTickets = Object.values(foundTickets).reduce((total, tickets) => total + tickets.length, 0);
                 
                 // Update summary text
                 $('#summaryText').html(`
-                    Dari <strong>${totalInput}</strong> nomor yang diperiksa:
+                    Dari <strong>${allNumbers.length}</strong> nomor yang diperiksa:
                     <strong>${foundCount}</strong> nomor ditemukan dengan <strong>${totalTickets}</strong> tiket,
                     <strong>${notFoundCount}</strong> nomor tidak ditemukan.
                 `);
+                
+                // Tampilkan semua nomor dengan statusnya
+                displayAllNumbersList(allNumbers, foundNumbers, notFoundNumbers);
                 
                 // Tampilkan tiket yang ditemukan
                 let accordionIndex = 0;
@@ -842,18 +875,6 @@ $jsonData = json_encode([
                     accordionIndex++;
                 }
                 
-                // Tampilkan nomor yang tidak ditemukan
-                if (notFoundNumbers.length > 0) {
-                    $('#notFoundContainer').removeClass('d-none');
-                    $('#notFoundList').html(
-                        notFoundNumbers.map(num => 
-                            `<div class="not-found-item">${num}</div>`
-                        ).join('')
-                    );
-                } else {
-                    $('#notFoundContainer').addClass('d-none');
-                }
-                
                 // Tampilkan hasil
                 $('#inetResults').removeClass('d-none');
                 
@@ -861,6 +882,26 @@ $jsonData = json_encode([
                 $('html, body').animate({
                     scrollTop: $('#inetResults').offset().top - 20
                 }, 500);
+            }
+            
+            // Function untuk menampilkan semua nomor dengan statusnya
+            function displayAllNumbersList(allNumbers, foundNumbers, notFoundNumbers) {
+                const allNumbersList = $('#allNumbersList');
+                allNumbersList.empty();
+                
+                allNumbers.forEach(num => {
+                    const isFound = foundNumbers.includes(num);
+                    const statusClass = isFound ? 'inet-found' : 'inet-notfound';
+                    const statusText = isFound ? 'DITEMUKAN' : 'TIDAK DITEMUKAN';
+                    const statusBadgeClass = isFound ? 'bg-success' : 'bg-danger';
+                    
+                    allNumbersList.append(`
+                        <div class="inet-result-item ${statusClass}">
+                            <span class="status-badge ${statusBadgeClass}">${statusText}</span>
+                            ${num}
+                        </div>
+                    `);
+                });
             }
             
             // Function untuk merender tiket
@@ -902,20 +943,19 @@ $jsonData = json_encode([
             $('#clearInput').on('click', function() {
                 $('#inetNumbers').val('');
                 $('#inetResults').addClass('d-none');
-                $('#notFoundContainer').addClass('d-none');
             });
             
-            // Copy not found numbers to clipboard
-            $('#copyNotFound').on('click', function() {
-                if (notFoundNumbers.length > 0) {
-                    const textToCopy = notFoundNumbers.join('\n');
+            // Copy all numbers to clipboard
+            $('#copyAllNumbers').on('click', function() {
+                if (allInetNumbers.length > 0) {
+                    const textToCopy = allInetNumbers.join('\n');
                     navigator.clipboard.writeText(textToCopy).then(function() {
                         // Ubah teks tombol sementara
-                        const originalText = $('#copyNotFound').html();
-                        $('#copyNotFound').html('<i class="bi bi-check"></i> Tersalin!');
+                        const originalText = $('#copyAllNumbers').html();
+                        $('#copyAllNumbers').html('<i class="bi bi-check"></i> Tersalin!');
                         
                         setTimeout(function() {
-                            $('#copyNotFound').html(originalText);
+                            $('#copyAllNumbers').html(originalText);
                         }, 2000);
                     }).catch(function(err) {
                         console.error('Could not copy text: ', err);
