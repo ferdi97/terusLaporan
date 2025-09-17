@@ -27,7 +27,7 @@ $statistics = [
 // Determine column indices for statistics
 $statusCol = array_search('STATUS', $headers);
 $priorityCol = array_search('PRIORITY', $headers);
-$typeCol = array_search('TICKET_TYPE', $headers);
+$typeCol = array_search('TIPE TIKET', $headers);
 
 // Find the internet number column
 $inetCol = array_search('NOMOR INET', $headers);
@@ -347,6 +347,16 @@ $jsonData = json_encode([
             margin-top: 15px;
         }
         
+        .nav-tabs .nav-link {
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
         @media (max-width: 768px) {
             .container-fluid {
                 padding: 10px;
@@ -470,43 +480,100 @@ $jsonData = json_encode([
                 <h5 class="mb-0"><i class="bi bi-search"></i> Cek Detail Tiket Berdasarkan Nomor Internet</h5>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="mb-3">
-                            <label for="inetNumbers" class="form-label">Masukkan nomor internet (satu nomor per baris):</label>
-                            <textarea class="form-control" id="inetNumbers" rows="8" placeholder="Contoh:&#10;1234567890&#10;0987654321&#10;..."></textarea>
-                            <div class="form-text">Anda dapat memasukkan hingga 1000 nomor internet sekaligus.</div>
+                <ul class="nav nav-tabs" id="inetTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="main-tab" data-bs-toggle="tab" data-bs-target="#main-tab-pane" type="button" role="tab" aria-controls="main-tab-pane" aria-selected="true">ENTYR DATA</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="backup-tab" data-bs-toggle="tab" data-bs-target="#backup-tab-pane" type="button" role="tab" aria-controls="backup-tab-pane" aria-selected="false">ALL DATA</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content mt-3" id="inetTabContent">
+                    <!-- Tab Database Utama -->
+                    <div class="tab-pane fade show active" id="main-tab-pane" role="tabpanel" aria-labelledby="main-tab" tabindex="0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="inetNumbers" class="form-label">Masukkan nomor internet (satu nomor per baris):</label>
+                                    <textarea class="form-control" id="inetNumbers" rows="8" placeholder="Contoh:&#10;1234567890&#10;0987654321&#10;..."></textarea>
+                                    <div class="form-text">Anda dapat memasukkan hingga 1000 nomor internet sekaligus.</div>
+                                </div>
+                                <button id="checkInetNumbers" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Cari Tiket
+                                </button>
+                                <button id="clearInput" class="btn btn-outline-secondary ms-2">
+                                    <i class="bi bi-trash"></i> Bersihkan
+                                </button>
+                            </div>
                         </div>
-                        <button id="checkInetNumbers" class="btn btn-primary">
-                            <i class="bi bi-search"></i> Cari Tiket
-                        </button>
-                        <button id="clearInput" class="btn btn-outline-secondary ms-2">
-                            <i class="bi bi-trash"></i> Bersihkan
-                        </button>
-                    </div>
-                </div>
 
-                <div id="inetResults" class="mt-4 d-none">
-                    <h5>Hasil Pencarian</h5>
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> 
-                        <span id="summaryText"></span>
+                        <div id="inetResults" class="mt-4 d-none">
+                            <h5>Hasil Pencarian</h5>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> 
+                                <span id="summaryText"></span>
+                            </div>
+                            
+                            <div class="result-container">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">Daftar Nomor Internet</h6>
+                                    <button class="copy-btn" id="copyAllNumbers">
+                                        <i class="bi bi-clipboard"></i> Salin Semua
+                                    </button>
+                                </div>
+                                <div id="allNumbersList" class="all-numbers-list">
+                                    <!-- Semua nomor akan ditampilkan di sini -->
+                                </div>
+                            </div>
+                            
+                            <div class="accordion mt-4" id="resultsAccordion">
+                                <!-- Detail tiket akan ditampilkan di sini -->
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="result-container">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0">Daftar Nomor Internet</h6>
-                            <button class="copy-btn" id="copyAllNumbers">
-                                <i class="bi bi-clipboard"></i> Salin Semua
-                            </button>
+                    <!-- Tab Database Backup -->
+                    <div class="tab-pane fade" id="backup-tab-pane" role="tabpanel" aria-labelledby="backup-tab" tabindex="0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="backupInetNumbers" class="form-label">Masukkan nomor internet (satu nomor per baris):</label>
+                                    <textarea class="form-control" id="backupInetNumbers" rows="8" placeholder="Contoh:&#10;1234567890&#10;0987654321&#10;..."></textarea>
+                                    <div class="form-text">Mencari data dari spreadsheet backup dengan ID: 1Iox7B43LcP_Am7XivUx9u-GJ6qT1BGoQpNGx1QDs28U</div>
+                                </div>
+                                <button id="checkBackupInetNumbers" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Cari Tiket
+                                </button>
+                                <button id="clearBackupInput" class="btn btn-outline-secondary ms-2">
+                                    <i class="bi bi-trash"></i> Bersihkan
+                                </button>
+                            </div>
                         </div>
-                        <div id="allNumbersList" class="all-numbers-list">
-                            <!-- Semua nomor akan ditampilkan di sini -->
+
+                        <div id="backupInetResults" class="mt-4 d-none">
+                            <h5>Hasil Pencarian (DATA ALL )</h5>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> 
+                                <span id="backupSummaryText"></span>
+                            </div>
+                            
+                            <div class="result-container">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">Daftar Nomor Internet</h6>
+                                    <button class="copy-btn" id="copyBackupAllNumbers">
+                                        <i class="bi bi-clipboard"></i> Salin Semua
+                                    </button>
+                                </div>
+                                <div id="backupAllNumbersList" class="all-numbers-list">
+                                    <!-- Semua nomor akan ditampilkan di sini -->
+                                </div>
+                            </div>
+                            
+                            <div class="accordion mt-4" id="backupResultsAccordion">
+                                <!-- Detail tiket akan ditampilkan di sini -->
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="accordion mt-4" id="resultsAccordion">
-                        <!-- Detail tiket akan ditampilkan di sini -->
                     </div>
                 </div>
             </div>
@@ -802,7 +869,7 @@ $jsonData = json_encode([
                 // Cari tiket berdasarkan nomor internet
                 const inetColIndex = appData.columnMap.inet;
                 if (inetColIndex === undefined || inetColIndex === false) {
-                    alert('Kolom NOMOR_INET tidak ditemukan dalam data!');
+                    alert('Kolom NOMOR INET tidak ditemukan dalam data!');
                     return;
                 }
                 
@@ -846,7 +913,7 @@ $jsonData = json_encode([
                 `);
                 
                 // Tampilkan semua nomor dengan statusnya
-                displayAllNumbersList(allNumbers, foundNumbers, notFoundNumbers);
+                displayAllNumbersList(allNumbers, foundNumbers, notFoundNumbers, 'allNumbersList');
                 
                 // Tampilkan tiket yang ditemukan
                 let accordionIndex = 0;
@@ -885,8 +952,8 @@ $jsonData = json_encode([
             }
             
             // Function untuk menampilkan semua nomor dengan statusnya
-            function displayAllNumbersList(allNumbers, foundNumbers, notFoundNumbers) {
-                const allNumbersList = $('#allNumbersList');
+            function displayAllNumbersList(allNumbers, foundNumbers, notFoundNumbers, containerId) {
+                const allNumbersList = $(`#${containerId}`);
                 allNumbersList.empty();
                 
                 allNumbers.forEach(num => {
@@ -956,6 +1023,216 @@ $jsonData = json_encode([
                         
                         setTimeout(function() {
                             $('#copyAllNumbers').html(originalText);
+                        }, 2000);
+                    }).catch(function(err) {
+                        console.error('Could not copy text: ', err);
+                        alert('Gagal menyalin teks ke clipboard');
+                    });
+                }
+            });
+            
+            // Function untuk mencari tiket dari spreadsheet backup
+            $('#checkBackupInetNumbers').on('click', function() {
+                const inetNumbersText = $('#backupInetNumbers').val().trim();
+                
+                if (!inetNumbersText) {
+                    alert('Masukkan nomor internet terlebih dahulu!');
+                    return;
+                }
+                
+                // Split input menjadi array dan bersihkan spasi
+                const backupInetNumbers = inetNumbersText.split('\n')
+                    .map(num => num.trim())
+                    .filter(num => num !== '');
+                
+                if (backupInetNumbers.length === 0) {
+                    alert('Tidak ada nomor internet yang valid!');
+                    return;
+                }
+                
+                // Tampilkan loading
+                $('#backupInetResults').addClass('d-none');
+                $('#backupResultsAccordion').html('<div class="loading-spinner"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Mencari data dari spreadsheet backup...</p></div>');
+                
+                // Fetch data dari spreadsheet backup
+                const backupSpreadsheetId = "1Iox7B43LcP_Am7XivUx9u-GJ6qT1BGoQpNGx1QDs28U";
+                const backupRange = "Sheet1!A1:AK";
+                const apiKey = "AIzaSyDFdaSruBmI5mqA48IdCDeJvlnUppiJ5jA";
+                
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${backupSpreadsheetId}/values/${backupRange}?key=${apiKey}`;
+                
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        const headers = data.values[0] || [];
+                        const rows = data.values.slice(1);
+                        
+                        // Cari kolom nomor internet - lebih fleksibel
+                        let inetColIndex = -1;
+                        
+                        // Coba beberapa kemungkinan nama kolom
+                        const possibleColumnNames = ['NOMOR INET', 'NOMOR_INET', 'INET', 'NOMORINET', 'INTERNET', 'NO INET', 'NO_INET'];
+                        
+                        for (const name of possibleColumnNames) {
+                            inetColIndex = headers.findIndex(header => 
+                                header.toString().trim().toUpperCase() === name
+                            );
+                            if (inetColIndex !== -1) break;
+                        }
+                        
+                        // Jika masih tidak ditemukan, cari kolom yang mengandung "inet"
+                        if (inetColIndex === -1) {
+                            inetColIndex = headers.findIndex(header => 
+                                header.toString().toLowerCase().includes('inet')
+                            );
+                        }
+                        
+                        // Jika masih tidak ditemukan, coba kolom pertama
+                        if (inetColIndex === -1) {
+                            inetColIndex = 0;
+                            console.warn('Kolom nomor internet tidak ditemukan, menggunakan kolom pertama');
+                        }
+                        
+                        // Cari semua tiket yang sesuai
+                        const foundTickets = {};
+                        const foundNumbers = [];
+                        const notFoundNumbers = [];
+                        
+                        backupInetNumbers.forEach(num => {
+                            const tickets = rows.filter(row => 
+                                row[inetColIndex] && row[inetColIndex].toString().trim() === num
+                            );
+                            
+                            if (tickets.length > 0) {
+                                foundTickets[num] = tickets;
+                                foundNumbers.push(num);
+                            } else {
+                                notFoundNumbers.push(num);
+                            }
+                        });
+                        
+                        // Tampilkan hasil
+                        displayBackupInetResults(foundTickets, backupInetNumbers, headers, foundNumbers, notFoundNumbers, inetColIndex);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching backup data:', error);
+                        $('#backupResultsAccordion').html('<div class="alert alert-danger">Terjadi kesalahan saat mengambil data dari spreadsheet backup.</div>');
+                    });
+            });
+            
+            // Function untuk menampilkan hasil pencarian dari backup
+            function displayBackupInetResults(foundTickets, allNumbers, headers, foundNumbers, notFoundNumbers, inetColIndex) {
+                const accordion = $('#backupResultsAccordion');
+                accordion.empty();
+                
+                // Hitung statistik
+                const foundCount = Object.keys(foundTickets).length;
+                const notFoundCount = allNumbers.length - foundCount;
+                const totalTickets = Object.values(foundTickets).reduce((total, tickets) => total + tickets.length, 0);
+                
+                // Update summary text
+                $('#backupSummaryText').html(`
+                    Dari <strong>${allNumbers.length}</strong> nomor yang diperiksa:
+                    <strong>${foundCount}</strong> nomor ditemukan dengan <strong>${totalTickets}</strong> tiket,
+                    <strong>${notFoundCount}</strong> nomor tidak ditemukan.
+                    <br><small>Kolom yang digunakan: <strong>${headers[inetColIndex]}</strong></small>
+                `);
+                
+                // Tampilkan semua nomor dengan statusnya
+                displayAllNumbersList(allNumbers, foundNumbers, notFoundNumbers, 'backupAllNumbersList');
+                
+                // Tampilkan tiket yang ditemukan
+                let accordionIndex = 0;
+                
+                for (const [inetNum, tickets] of Object.entries(foundTickets)) {
+                    const accordionId = `backupCollapse${accordionIndex}`;
+                    const headingId = `backupHeading${accordionIndex}`;
+                    
+                    // Buat header accordion
+                    accordion.append(`
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="${headingId}">
+                                <button class="accordion-button ${accordionIndex > 0 ? 'collapsed' : ''}" type="button" data-bs-toggle="collapse" data-bs-target="#${accordionId}" aria-expanded="${accordionIndex === 0 ? 'true' : 'false'}" aria-controls="${accordionId}">
+                                    <span class="badge bg-success me-2">${tickets.length} tiket</span> 
+                                    ${inetNum}
+                                </button>
+                            </h2>
+                            <div id="${accordionId}" class="accordion-collapse collapse ${accordionIndex === 0 ? 'show' : ''}" aria-labelledby="${headingId}" data-bs-parent="#backupResultsAccordion">
+                                <div class="accordion-body">
+                                    ${renderBackupTickets(tickets, headers)}
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                    
+                    accordionIndex++;
+                }
+                
+                // Jika tidak ada tiket yang ditemukan
+                if (accordionIndex === 0) {
+                    accordion.html('<div class="alert alert-warning">Tidak ada tiket yang ditemukan untuk nomor-nomor yang dimasukkan.</div>');
+                }
+                
+                // Tampilkan hasil
+                $('#backupInetResults').removeClass('d-none');
+                
+                // Scroll ke hasil
+                $('html, body').animate({
+                    scrollTop: $('#backupInetResults').offset().top - 20
+                }, 500);
+            }
+            
+            // Function untuk merender tiket dari backup
+            function renderBackupTickets(tickets, headers) {
+                let ticketsHtml = '';
+                
+                tickets.forEach((ticket, index) => {
+                    ticketsHtml += `
+                        <div class="ticket-item mb-3">
+                            <div class="ticket-header">
+                                <h6 class="mb-0">Tiket #${index + 1}</h6>
+                            </div>
+                            <div class="ticket-details">
+                                ${headers.map((header, colIndex) => {
+                                    if (ticket[colIndex] && ticket[colIndex].toString().trim() !== '') {
+                                        return `
+                                            <div class="detail-item">
+                                                <div class="detail-label">${header}</div>
+                                                <div class="detail-value">${escapeHtml(ticket[colIndex])}</div>
+                                            </div>
+                                        `;
+                                    }
+                                    return '';
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                return ticketsHtml;
+            }
+            
+            // Clear backup input button
+            $('#clearBackupInput').on('click', function() {
+                $('#backupInetNumbers').val('');
+                $('#backupInetResults').addClass('d-none');
+            });
+            
+            // Copy all backup numbers to clipboard
+            $('#copyBackupAllNumbers').on('click', function() {
+                const backupInetNumbers = $('#backupInetNumbers').val().trim().split('\n')
+                    .map(num => num.trim())
+                    .filter(num => num !== '');
+                
+                if (backupInetNumbers.length > 0) {
+                    const textToCopy = backupInetNumbers.join('\n');
+                    navigator.clipboard.writeText(textToCopy).then(function() {
+                        // Ubah teks tombol sementara
+                        const originalText = $('#copyBackupAllNumbers').html();
+                        $('#copyBackupAllNumbers').html('<i class="bi bi-check"></i> Tersalin!');
+                        
+                        setTimeout(function() {
+                            $('#copyBackupAllNumbers').html(originalText);
                         }, 2000);
                     }).catch(function(err) {
                         console.error('Could not copy text: ', err);
